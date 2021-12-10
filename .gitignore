@@ -1,0 +1,6 @@
+/bin
+/obj
+_*
+*.exe
+/dotenv
+/load.ps1

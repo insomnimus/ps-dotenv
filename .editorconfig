@@ -1,0 +1,18 @@
+root = true
+
+[*]
+end_of_line = lf
+indent_style = tab
+trim_trailing_whitespace = true
+insert_final_newline = true
+charset = utf-8
+
+[*.cs]
+csharp_new_line_before_open_brace = false
+# csharp_new_line_before_else = never
+csharp_new_line_before_else = false
+csharp_new_line_before_catch = false
+csharp_new_line_before_finally = false
+csharp_new_line_between_query_expression_clauses = false
+
+csharp_space_before_colon_in_inheritance_clause = false
