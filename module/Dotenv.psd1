@@ -1,10 +1,14 @@
 @{
-RootModule = "PS_Dotenv.dll"
-ModuleVersion = "0.1.0"
-Author = "insomnia"
+	RootModule = "Dotenv.psm1"
+	ModuleVersion = "0.1.0"
+	Author = "insomnia"
 
-FunctionsToExport = @()
-CmdletsToExport = @("Read-Dotenv")
-VariablesToExport = @()
-AliasesToExport = @()
+	FunctionsToExport = @("Update-Dotenv")
+	CmdletsToExport = @("Read-Dotenv")
+	VariablesToExport = @()
+	AliasesToExport = @()
+
+	NestedModules = @(
+		"Dotenv.dll"
+	)
 }

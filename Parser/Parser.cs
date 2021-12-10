@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using Dotenv;
 
 namespace Dotenv.Parser {
 	public class Parser {

@@ -1,18 +1,11 @@
 using System;
+using Dotenv;
 
 namespace Dotenv.Parser {
 	public class ParseResult {
 		public bool IsError { get; set; }
 		public EnvEntry Entry;
 		public ParseError Error;
-	}
-
-	public enum QuoteKind {
-		Bare,
-		Single,
-		Double,
-		MultiSingle,
-		MultiDouble
 	}
 
 	internal class Str {
@@ -23,11 +16,5 @@ namespace Dotenv.Parser {
 			value = s;
 			quote = q;
 		}
-	}
-
-	public class EnvEntry {
-		public string Name { get; set; }
-		public QuoteKind Quote { get; set; }
-		public string Value { get; set; }
 	}
 }

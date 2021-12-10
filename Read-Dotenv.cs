@@ -4,7 +4,7 @@ using Dotenv.Parser;
 
 namespace Dotenv {
 	[Cmdlet(VerbsCommunications.Read, "Dotenv", DefaultParameterSetName = "file")]
-	[OutputType(typeof(Parser.EnvEntry))]
+	[OutputType(typeof(EnvEntry))]
 	public class ReadDotenvCmd: PSCmdlet {
 		[Parameter(
 		HelpMessage = "Path to a .env file.",
