@@ -15,13 +15,6 @@ namespace Dotenv {
 			ValueFromPipelineByPropertyName = true)]
 		public string Path { get; set; }
 		[Parameter(
-		HelpMessage = "Literal path to a .env file.",
-			Mandatory = true,
-			ParameterSetName = "literal",
-			ValueFromPipeline = true,
-			ValueFromPipelineByPropertyName = true)]
-		public string LiteralPath { get; set; }
-		[Parameter(
 		Mandatory = true,
 		Position = 0,
 		ParameterSetName = "text",
@@ -39,10 +32,7 @@ namespace Dotenv {
 		private ErrorAction pref => StopOnError ? ErrorAction.Stop : ErrorAction.Continue;
 		private string filepath {
 			get {
-				if (this.ParameterSetName == "literal") {
-					return this.LiteralPath;
-				}
-				return System.IO.Path.GetFullPath(this.Path);
+				return this.GetUnresolvedProviderPathFromPSPath(this.Path);
 			}
 		}
 		private string data {

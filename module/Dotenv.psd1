@@ -3,7 +3,12 @@
 	ModuleVersion = "0.1.0"
 	Author = "insomnia"
 
-	FunctionsToExport = @("Update-Dotenv")
+	FunctionsToExport = @(
+		"Update-Dotenv"
+		"Enable-Dotenv"
+		"Disable-Dotenv"
+		"Show-Dotenv"
+	)
 	CmdletsToExport = @("Read-Dotenv")
 	VariablesToExport = @()
 	AliasesToExport = @()
