@@ -8,6 +8,10 @@
 		"Enable-Dotenv"
 		"Disable-Dotenv"
 		"Show-Dotenv"
+		"Add-DotenvName"
+		"Remove-DotenvName"
+		"Set-DotenvLogLevel"
+		"Get-DotenvLogLevel"
 	)
 	CmdletsToExport = @("Read-Dotenv")
 	VariablesToExport = @()
@@ -15,5 +19,6 @@
 
 	NestedModules = @(
 		"Dotenv.dll"
+		"Dotenv.Logging.ps1"
 	)
 }
