@@ -13,6 +13,10 @@ class DotenvEntry {
 	[string]$value
 	[string]$replaced
 
+	[string]ToString() {
+		return "$($this.name) = $($this.value)"
+	}
+
 	DotenvEntry([Dotenv.EnvEntry]$entry) {
 		$this.replaced = get-content "env:$($entry.name)" -errorAction ignore
 		# If it's double quoted or bare, expand env vars.
@@ -126,6 +130,7 @@ function Disable-Dotenv {
 function Show-Dotenv {
 	@{
 		Enabled = $script:enabled
-		Dotenvs = $script:envs
+		Sourced = $script:envs.root
+		Vars = $script:envs.vars
 	}
 }
