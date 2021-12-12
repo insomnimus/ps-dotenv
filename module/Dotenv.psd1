@@ -8,8 +8,8 @@
 		"Enable-Dotenv"
 		"Disable-Dotenv"
 		"Show-Dotenv"
-		"Add-DotenvName"
-		"Remove-DotenvName"
+		"Register-DotenvName"
+		"Unregister-DotenvName"
 		"Set-DotenvLogLevel"
 		"Get-DotenvLogLevel"
 	)

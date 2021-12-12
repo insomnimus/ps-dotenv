@@ -2,328 +2,65 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using Dotenv;
+using Dotenv.Errors;
+using System.Runtime.InteropServices;
 
 namespace Dotenv.Parser {
 	public class Parser {
+		private const char EOF = char.MinValue;
+
 		private string input;
-		private string chars => input;
 		private int pos = 0;
 		private int readpos = 0;
 		private char ch;
 		private int line = 0;
-		private const char EOF = char.MinValue;
+		private char peek => readpos >= input.Length ? EOF : input[readpos];
+		private List<EnvEntry> parsedVars = new List<EnvEntry>() { };
+		private StringComparison comparisonType;
 
-		public Parser(string content) {
-			this.input = content;
+		public Parser(string input) {
+			this.input = input;
 			this.read();
-		}
-
-		private char peek {
-			get {
-				if (readpos >= chars.Length) {
-					return EOF;
-				}
-				return chars[readpos];
-			}
-		}
-
-		private void read() {
-			if (readpos >= chars.Length) {
-				ch = EOF;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+				this.comparisonType = StringComparison.OrdinalIgnoreCase;
 			} else {
-				ch = chars[readpos];
-			}
-			pos = readpos;
-			readpos++;
-			if (ch == '\n') {
-				line++;
+				this.comparisonType = StringComparison.Ordinal;
 			}
 		}
 
-		private char escape(char c) {
-			switch (c) {
-				case 'n': return '\n';
-				case 'r': return '\r';
-				case 't': return '\t';
-				default: return c;
-			};
+		internal string getenv(string key) {
+			// Check if we parsed the var.
+			var entry = this.parsedVars.FindLast(e => e.Name.Equals(key, this.comparisonType));
+			return entry?.Value ?? Environment.GetEnvironmentVariable(key);
 		}
 
-		private void skipLine() {
-			while (ch != '\n' && ch != EOF) {
-				read();
-			}
-			read();
-		}
+		internal static char escaped(char c) => c switch {
+			'n' => '\n',
+			'r' => '\r',
+			'f' => '\f',
+			't' => '\t',
+			'b' => '\b',
+			_ => c,
+		};
 
-		private void skipAny(string anyof) {
-			while (containsChar(anyof, ch)) {
-				read();
-			}
-		}
+		bool aheadIs(string s) => input.Substring(pos).StartsWith(s, StringComparison.Ordinal);
 
-		private bool aheadIs(string s) {
-			if (pos + s.Length >= chars.Length) {
-				return false;
-			}
-			return input.Substring(pos, s.Length) == s;
-		}
-
-		private Result readKey() {
-			// Must start with `_` or a letter.
-			if (ch != '_' && !char.IsLetter(ch)) {
-				var err = new ErrInvalidName(line);
-				return new Result(err);
-			}
-			var start = pos;
-			read();
-			while (char.IsLetter(ch) || char.IsDigit(ch)) {
-				read();
-			}
-			return new Result(input.Substring(start, pos - start));
-		}
-
-		private StrResult readValue() {
-			QuoteKind q;
-			Result res;
-			switch (ch) {
-				case '\'':
-					if (aheadIs("'''")) {
-						res = readMultiSingleQuote();
-						q = QuoteKind.MultiSingle;
-					} else {
-						res = readSingleQuote();
-						q = QuoteKind.Single;
-					}
-					break;
-				case '"':
-					if (aheadIs("\"\"\"")) {
-						res = readMultiDoubleQuote();
-						q = QuoteKind.MultiDouble;
-					} else {
-						res = readDoubleQuote();
-						q = QuoteKind.Double;
-					}
-					break;
-				default:
-					res = readBare();
-					q = QuoteKind.Bare;
-					break;
-			};
-			if (res.IsError) {
-				return new StrResult(res.Error);
-			}
-			return new StrResult(res.Ok, q);
-		}
-
-		private Result readBare() {
-			var start = pos;
-			while (ch != EOF && !char.IsWhiteSpace(ch)) {
-				read();
-			}
-
-			return checkEOL(input.Substring(start, pos - start));
-		}
-
-		private Result readSingleQuote() {
-			read();
-			var ln = line;
-			var buf = new StringBuilder();
-
-			while (ch != '\'') {
-				switch (ch) {
-					case EOF:
-					case '\n':
-						return new Result(new ErrUnclosedQuote(ln, QuoteKind.Single));
-					case '\\':
-						if (peek == '\'') {
-							buf.Append('\'');
-							read();
-						} else {
-							buf.Append('\\');
-						}
-						break;
-					default:
-						buf.Append(ch);
-						break;
-				};
-				read();
-			}
-
-			read();
-			return checkEOL(buf.ToString());
-		}
-
-		private Result readDoubleQuote() {
-			var ln = line;
-			read();
-			var buf = new StringBuilder();
-
-			while (ch != '"') {
-				switch (ch) {
-					case EOF:
-						return new Result(new ErrUnclosedQuote(line, QuoteKind.Double));
-					case '\\':
-						read();
-						if (ch == EOF) {
-							return new Result(new ErrUnclosedQuote(ln, QuoteKind.Double));
-						}
-						buf.Append(escape(ch));
-						break;
-					default:
-						buf.Append(ch);
-						break;
-				};
-				read();
-			}
-
-			read();
-			return checkEOL(buf.ToString());
-		}
-
-		private Result readMultiDoubleQuote() {
-			var ln = line;
-			var buf = new StringBuilder();
-			expect("\"\"\"");
-			if (ch == '\n') {
-				read();
-			} else if (ch == '\r' && peek == '\n') {
-				read();
-				read();
+		internal void read() {
+			if (readpos >= input.Length) {
+				this.ch = EOF;
+				pos = input.Length;
+				readpos = input.Length + 1;
+				return;
 			} else {
-				return new Result(new ErrInvalidMultiline(ln));
+				this.ch = input[readpos];
 			}
-
-			while (true) {
-				switch (ch) {
-					case EOF: return new Result(new ErrUnclosedQuote(ln, QuoteKind.MultiDouble));
-					case '\\':
-						read();
-						if (ch == EOF) {
-							return new Result(new ErrUnclosedQuote(ln, QuoteKind.MultiDouble));
-						}
-						buf.Append(escape(ch));
-						break;
-					case '"':
-						if (aheadIs("\"\"\"")) {
-							for (var i = 0; i < 4; i++) read();
-							return checkEOL(buf.ToString());
-						}
-						buf.Append(ch);
-						break;
-					default:
-						buf.Append(ch);
-						break;
-				};
-				read();
-			}
+			this.pos = this.readpos;
+			this.readpos++;
+			if (ch == '\n') this.line++;
 		}
 
-		private Result readMultiSingleQuote() {
-			var ln = line;
-			var buf = new StringBuilder();
-			expect("'''");
-			if (ch == '\n') {
-				read();
-			} else if (ch == '\r' && peek == '\n') {
-				read();
-				read();
-			} else {
-				return new Result(new ErrInvalidMultiline(ln));
-			}
-
-			while (true) {
-				switch (ch) {
-					case EOF: return new Result(new ErrUnclosedQuote(ln, QuoteKind.MultiSingle));
-					case '\\':
-						if (peek == '\'') {
-							read();
-							buf.Append('\'');
-						} else {
-							buf.Append('\\');
-						}
-						break;
-					case '\'':
-						if (aheadIs("'''")) {
-							for (var i = 0; i < 4; i++) read();
-							return checkEOL(buf.ToString());
-						}
-						buf.Append(ch);
-						break;
-					default:
-						buf.Append(ch);
-						break;
-				};
-				read();
-			}
-		}
-
-		private ParseResult parseEntry() {
-			// skip whitespace.
-			skipAny(" \r\n\t");
-			if (ch == '#') {
-				skipLine();
-				return parseEntry();
-			}
-
-			var ln = line;
-			var key = readKey();
-			if (key.IsError) {
-				return new ParseResult {
-					IsError = true,
-					Error = key.Error,
-					Entry = null
-				};
-			}
-			skipAny(" \t");
-			if (ch != '=') {
-				return new ParseResult {
-					IsError = true,
-					Error = new ErrMissingEquals(ln),
-					Entry = null
-				};
-			}
-			read();
-			skipAny(" \t");
-			if (ch == '\n') {
-				read();
-				return new ParseResult {
-					IsError = false,
-					Entry = new EnvEntry { Name = key.Ok, Quote = QuoteKind.Bare, Value = "" },
-					Error = null
-				};
-			} else if (ch == '\r' && peek == '\n') {
-				read();
-				read();
-				return new ParseResult {
-					IsError = false,
-					Entry = new EnvEntry { Name = key.Ok, Quote = QuoteKind.Bare, Value = "" },
-					Error = null
-				};
-			}
-
-			var value = readValue();
-			if (value.IsError) {
-				return new ParseResult {
-					IsError = true,
-					Error = value.Error,
-					Entry = null
-				};
-			}
-			var entry = new EnvEntry {
-				Name = key.Ok,
-				Quote = value.Kind,
-				Value = value.Ok
-			};
-			return new ParseResult {
-				IsError = false,
-				Error = null,
-				Entry = entry
-			};
-		}
-
-		private void expect(string s) {
-			if (!aheadIs(s)) {
+		internal void expect(string s) {
+			if (!this.aheadIs(s)) {
 				var len = Math.Min(s.Length, input.Length - pos);
 				var got = input.Substring(pos, len);
 				throw new LogicException($"assertion failed: expected '{s}' ahead; got '{got}'");
@@ -331,63 +68,268 @@ namespace Dotenv.Parser {
 			foreach (var _ in s) read();
 		}
 
-		private bool containsChar(string s, char c) {
-			foreach (var x in s) {
-				if (c == x) {
-					return true;
+		internal void expect(char c) {
+			if (ch != c) throw new LogicException($"assertion failed: expected {c}, got {ch}");
+			else read();
+		}
+
+		internal void skipLine() {
+			while (ch != '\n' && ch != EOF) read();
+			read();
+		}
+
+		internal void skipAny(string anyof) {
+			while (anyof.Contains(ch)) read();
+		}
+
+		internal Result<string> parseLHS() {
+			if (ch != '_' && !char.IsLetter(ch)) {
+				return new ErrInvalidName(line);
+			}
+			var start = pos;
+			while (ch == '_' || char.IsLetter(ch) || char.IsDigit(ch)) read();
+			return input.Substring(start, pos - start);
+		}
+
+		internal Result<string> readBare() {
+			var ln = line;
+			Result<string> res;
+
+			var buf = new StringBuilder();
+			while (ch != EOF && !char.IsWhiteSpace(ch)) {
+				if (ch == '$') {
+					res = this.parseExpand();
+					if (res.IsErr) return res;
+					else buf.Append(res.Ok);
+				} else {
+					buf.Append(ch);
+					read();
 				}
 			}
-			return false;
+
+			return buf.ToString();
 		}
 
-		private Result checkEOL(string parsed) {
-			if (!(ch == EOF || ch == '\n' || (ch == '\r' && peek == '\n'))) {
-				return new Result(new ErrMissingNewline(line));
+		internal Result<string> readSingleQuote() {
+			var ln = line;
+			this.expect('\'');
+			var buf = new StringBuilder();
+
+			while (ch != '\'') {
+				switch (ch) {
+					case EOF:
+					case '\n':
+						return new ErrUnclosedQuote(ln, Quote.Single);
+					case '\\':
+						if (peek == '\'') read();
+						buf.Append(ch);
+						break;
+					default:
+						buf.Append(ch);
+						break;
+				};
+				read();
 			}
-			return new Result(parsed);
+
+			// Consume the quote.
+			this.expect("'");
+			return buf.ToString();
 		}
 
-		public List<ParseResult> Parse(ErrorAction action = ErrorAction.Stop) {
-			var items = new List<ParseResult>() { };
+		internal Result<string> readDoubleQuote() {
+			var ln = line;
+			this.expect('"');
+			var buf = new StringBuilder();
+
+			while (ch != '"') {
+				var mustRead = true;
+				switch (ch) {
+					case '$':
+						var res = this.parseExpand();
+						if (res.IsErr) return res;
+						else buf.Append(res.Ok);
+						mustRead = false;
+						break;
+					case EOF:
+					case '\n':
+						return new ErrUnclosedQuote(ln, Quote.Double);
+					case '\\':
+						read();
+						if (ch == EOF) return new ErrUnclosedQuote(ln, Quote.Double);
+						buf.Append(escaped(ch));
+						break;
+					default:
+						buf.Append(ch);
+						break;
+				};
+
+				if (mustRead) read();
+			}
+
+			// Consume the quote.
+			this.expect('"');
+			return buf.ToString();
+		}
+
+		internal Result<string> readMultiSingle() {
+			var ln = line;
+			this.expect("'''");
+			while (ch != '\n') {
+				if (ch == EOF || !char.IsWhiteSpace(ch)) return new ErrInvalidMultiline(ln);
+				read();
+			}
+			this.expect('\n');
+
+			var buf = new StringBuilder();
+			while (true) {
+				switch (ch) {
+					case EOF: return new ErrUnclosedQuote(ln, Quote.MultiSingle);
+					case '\\':
+						if (peek == '\'') read();
+						buf.Append(ch);
+						break;
+					case '\'':
+						if (aheadIs("'''")) {
+							for (int i = 0; i < 4; i++) read();
+							return buf.ToString();
+						}
+						buf.Append(ch);
+						break;
+					default:
+						buf.Append(ch);
+						break;
+				};
+				read();
+			}
+		}
+
+		internal Result<string> readMultiDouble() {
+			var ln = line;
+			this.expect("\"\"\"");
+			while (ch != '\n') {
+				if (ch == EOF || !char.IsWhiteSpace(ch)) return new ErrInvalidMultiline(ln);
+				read();
+			}
+			this.expect('\n');
+
+			var buf = new StringBuilder();
+			while (true) {
+				var mustRead = true;
+				switch (ch) {
+					case EOF: return new ErrUnclosedQuote(ln, Quote.MultiDouble);
+					case '"' when this.aheadIs("\"\"\""):
+						for (var i = 0; i < 4; i++) read();
+						return buf.ToString();
+					case '\\':
+						read();
+						if (ch == EOF) return new ErrUnclosedQuote(ln, Quote.MultiDouble);
+						buf.Append(escaped(ch));
+						break;
+					case '$':
+						mustRead = false;
+						var res = this.parseExpand();
+						if (res.IsErr) return res;
+						else buf.Append(res.Ok);
+						break;
+					default:
+						buf.Append(ch);
+						break;
+				};
+				if (mustRead) read();
+			}
+		}
+
+		internal Result<string> parseRHS() => ch switch {
+			'\n' => "",
+			'\r' when peek == '\n' => "",
+			'"' when this.aheadIs("\"\"\"") => this.readMultiDouble(),
+			'"' => this.readDoubleQuote(),
+			'\'' when this.aheadIs("'''") => this.readMultiSingle(),
+			'\'' => this.readSingleQuote(),
+			_ => this.readBare(),
+		};
+
+		internal Result<string> parseExpand() {
+			this.expect('$');
+			Result<string> res;
+			if (ch == '{') res = readBracedExpand();
+			else if (ch == '_' || char.IsLetter(ch)) res = this.readNormalExpand();
+			else {
+				read();
+				return "$";
+			}
+			if (res.IsErr) return res.Err;
+			else return this.getenv(res.Ok);
+		}
+
+		internal string readNormalExpand() {
+			var start = pos;
+			while (ch == '_' || char.IsLetter(ch) || char.IsDigit(ch)) read();
+			return input.Substring(start, pos - start);
+		}
+
+		internal Result<string> readBracedExpand() {
+			var ln = line;
+			this.expect('{');
+			var start = pos;
+			while (ch != '}') {
+				if (ch == '\n' || (ch == '\r' && peek == '\n')) return new ErrMissingRBrace(ln);
+				read();
+			}
+			this.expect('}');
+			return input.Substring(start, pos - 1 - start);
+		}
+
+		internal Result<EnvEntry> parseEntry() {
+			// Skip whitespace.
+			while (ch != EOF && char.IsWhiteSpace(ch)) read();
+			if (ch == '#') {
+				this.skipLine();
+				return this.parseEntry();
+			}
+			if (ch == EOF) return null;
+
+			var ln = line;
+			var key = this.parseLHS();
+			if (key.IsErr) return key.Err;
+
+			// Ignore whitespace as a separator.
+			this.skipAny(" \t");
+			if (ch != '=') return new ErrMissingEquals(ln);
+			this.expect('=');
+			this.skipAny(" \t");
+
+			var rhs = this.parseRHS();
+			if (rhs.IsErr) return rhs.Err;
+
+			// Check for EOF or LF.
+			while (ch != EOF && ch != '\n') {
+				if (!char.IsWhiteSpace(ch)) return new ErrMissingNewline(line);
+				read();
+			}
+
+			var entry = new EnvEntry(key.Ok, rhs.Ok);
+			this.parsedVars.Add(entry);
+			return entry;
+		}
+
+		public ParseResult Parse(bool skipErrors = false) {
+			var items = new ParseResult();
+
 			while (ch != EOF) {
 				var res = this.parseEntry();
-				items.Add(res);
-				if (res.IsError) {
-					switch (action) {
-						case ErrorAction.Stop:
-							return items;
-						case ErrorAction.Continue:
-							this.skipLine();
-							break;
-						case ErrorAction.Panic:
-							throw res.Error;
-					};
-				}
+				if (res == null) break;
+				items.add(res);
+				if (res.IsErr && skipErrors) this.skipLine();
+				else if (res.IsErr) return items;
 			}
+
 			return items;
 		}
 
-		public List<EnvEntry> ParseEntries() {
-			var items = new List<EnvEntry>() { };
-			ParseResult res;
-			while (ch != EOF) {
-				res = this.parseEntry();
-				if (res.IsError) {
-					throw res.Error;
-				}
-				items.Add(res.Entry);
-			}
-			return items;
-		}
-
-		public static List<EnvEntry> ParseEntries(string data) {
-			var p = new Parser(data);
-			return p.ParseEntries();
-		}
-
-		public static List<ParseResult> Parse(string data, ErrorAction action = ErrorAction.Stop) {
-			var p = new Parser(data);
-			return p.Parse(action);
+		public static ParseResult Parse(string text, bool skipErrors = false) {
+			var p = new Parser(text);
+			return p.Parse(skipErrors);
 		}
 	}
 }

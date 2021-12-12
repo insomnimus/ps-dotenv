@@ -1,6 +1,7 @@
 using System;
 using System.Management.Automation;
 using Dotenv.Parser;
+using Dotenv.Errors;
 
 namespace Dotenv {
 	[Cmdlet(VerbsCommunications.Read, "Dotenv", DefaultParameterSetName = "file")]
@@ -24,35 +25,19 @@ namespace Dotenv {
 		)]
 		public string Text { get; set; }
 
-		[Parameter(HelpMessage = "Stop parsing if any line is invalid. The default behaviour is to continue parsing.")]
-		public SwitchParameter StopOnError { get; set; }
-		[Parameter(HelpMessage = "Ignore every error; only return entries.")]
-		public SwitchParameter IgnoreErrors { get; set; }
+		[Parameter(HelpMessage = "Skip syntax errors if any are encountered. The default behaviour is to stop parsing.")]
+		public SwitchParameter SkipErrors { get; set; }
 
-		private ErrorAction pref => StopOnError ? ErrorAction.Stop : ErrorAction.Continue;
-		private string filepath {
-			get {
-				return this.GetUnresolvedProviderPathFromPSPath(this.Path);
-			}
-		}
-		private string data {
-			get {
-				if (this.ParameterSetName == "text") {
-					return this.Text;
-				}
-				return System.IO.File.ReadAllText(this.filepath);
-			}
-		}
+		private string filepath => this.GetUnresolvedProviderPathFromPSPath(this.Path);
+		private string data => this.ParameterSetName switch {
+			"text" => this.Text,
+			_ => System.IO.File.ReadAllText(this.filepath),
+		};
 
 		protected override void ProcessRecord() {
-			var vars = Parser.Parser.Parse(this.data, this.pref);
-			foreach (var x in vars) {
-				if (!x.IsError) {
-					this.WriteObject(x.Entry);
-				} else if (!IgnoreErrors) {
-					this.WriteError(new ErrorRecord(x.Error, "Dotenv.ParseError", ErrorCategory.ParserError, null));
-				}
-			}
+			var res = Parser.Parser.Parse(this.data, this.SkipErrors);
+			foreach (var e in res.Entries) this.WriteObject(e);
+			foreach (var e in res.Errors) this.WriteError(new ErrorRecord(e, "Dotenv.ParseError", ErrorCategory.ParserError, null));
 		}
 	}
 }

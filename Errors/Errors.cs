@@ -1,9 +1,8 @@
 using System;
 
-namespace Dotenv.Parser {
+namespace Dotenv.Errors {
 	public abstract class ParseError: Exception {
 		public int Line { get; set; }
-		// public string Message {get; private set;}
 
 		public ParseError(int line, string msg)
 		: base($"line {line}: {msg}") {
@@ -22,26 +21,17 @@ namespace Dotenv.Parser {
 	}
 
 	public class ErrUnclosedQuote: ParseError {
-		public QuoteKind Kind { get; private set; }
+		public Quote Kind { get; set; }
 
-		internal static string quoteStr(QuoteKind q) {
-			switch (q) {
-				case QuoteKind.Single:
-					return "single";
-				case QuoteKind.Double:
-					return "double";
-				case QuoteKind.MultiDouble:
-					return "multiline double";
-				case QuoteKind.MultiSingle:
-					return "multiline single";
-				case QuoteKind.Bare:
-					return "bare";
-				default:
-					return "";
-			};
-		}
+		internal static string quoteStr(Quote q) => q switch {
+			Quote.Double => "double",
+			Quote.Single => "single",
+			Quote.MultiDouble => "multiline double",
+			Quote.MultiSingle => "multiline single",
+			_ => throw new LogicException($"{q} is not a recognized Quote")
+		};
 
-		public ErrUnclosedQuote(int line, QuoteKind kind)
+		public ErrUnclosedQuote(int line, Quote kind)
 		: base(line, $"unclosed {quoteStr(kind)} quote") {
 			Kind = kind;
 		}
@@ -54,11 +44,16 @@ namespace Dotenv.Parser {
 
 	public class LogicException: ParseError {
 		public LogicException(string msg)
-		: base(0, msg) { }
+		: base(0, $"internal logic error: {msg}") { }
 	}
 
 	public class ErrMissingNewline: ParseError {
 		public ErrMissingNewline(int line)
-		: base(line, "missing newline at the end of the value text") { }
+		: base(line, "missing newline at the end of the right hand side of '='") { }
+	}
+
+	public class ErrMissingRBrace: ParseError {
+		public ErrMissingRBrace(int line)
+		: base(line, "the closing brace for the ${} interpolated variable is missing") { }
 	}
 }

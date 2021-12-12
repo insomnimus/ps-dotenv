@@ -1,32 +1,32 @@
+using System;
+using System.Collections.Generic;
+using Dotenv;
+using Dotenv.Errors;
+
 namespace Dotenv.Parser {
-	internal class Result {
-		public bool IsError;
-		public string Ok;
-		public ParseError Error;
+	internal class Result<T> {
+		public T Ok { get; set; }
+		public ParseError Err { get; set; }
+		public bool IsErr => this.Err != null;
 
-		public Result(string val) {
-			this.IsError = false;
-			this.Ok = val;
-		}
+		public Result(T ok) => (this.Ok, this.Err) = (ok, null);
+		public Result(ParseError err) => (this.Ok, this.Err) = (default(T), err);
 
-		public Result(ParseError err) {
-			this.IsError = true;
-			this.Error = err;
-		}
+		public static implicit operator Result<T>(T ok) => new Result<T>(ok);
+		public static implicit operator Result<T>(ParseError e) => new Result<T>(e);
 	}
 
-	internal class StrResult: Result {
-		public QuoteKind Kind;
+	public class ParseResult {
+		public List<EnvEntry> Entries { get; private set; }
+		public List<ParseError> Errors { get; private set; }
+		public bool HasError => Errors.Count > 0;
 
-		public StrResult(ParseError e)
-		: base(e) { }
+		internal ParseResult(List<EnvEntry> entries, List<ParseError> errors) => (this.Entries, this.Errors) = (entries, errors);
+		internal ParseResult() => (this.Entries, this.Errors) = (new List<EnvEntry>() { }, new List<ParseError>() { });
 
-		public StrResult(string s)
-		: base(s) { }
-
-		public StrResult(string s, QuoteKind q)
-		: base(s) {
-			Kind = q;
+		internal void add(Result<EnvEntry> res) {
+			if (res.IsErr) this.Errors.Add(res.Err);
+			else this.Entries.Add(res.Ok);
 		}
 	}
 }

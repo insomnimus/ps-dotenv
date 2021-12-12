@@ -12,10 +12,6 @@
 	$true
 }
 
-function expand-env($s) {
-	$ExecutionContext.InvokeCommand.ExpandString($s)
-}
-
 class DotenvEntry {
 	[string]$name
 	[string]$value
@@ -27,14 +23,9 @@ class DotenvEntry {
 
 	DotenvEntry([Dotenv.EnvEntry]$entry) {
 		$this.replaced = get-content "env:$($entry.name)" -errorAction ignore
-		# If it's double quoted or bare, expand env vars.
-		if(-not ($entry.quote -eq [Dotenv.QuoteKind]::Single -or $entry.quote -eq [Dotenv.QuoteKind]::MultiSingle)) {
-			$this.value = script:expand-env ($entry.value -replace '\$([^"])', '$env:$1')
-		} else {
-			$this.value = $entry.value
-		}
-		set-item "env:$($entry.name)" $this.value
 		$this.name = $entry.name
+		$this.value = $entry.value
+		set-item "env:$($entry.name)" $this.value
 	}
 }
 
@@ -73,7 +64,7 @@ function Source-Dotenv {
 		return
 	}
 
-	$vars = read-dotenv $path -ignoreErrors | % { [DotenvEntry]::new($_) }
+	$vars = read-dotenv $path -skipErrors | % { [DotenvEntry]::new($_) }
 	if($vars) {
 		script::debug "sourcing $path ($($vars.length) items)"
 		$script:envs.add([Dotenv]@{
@@ -168,7 +159,7 @@ function Show-Dotenv {
 	}
 }
 
-function Add-DotenvName {
+function Register-DotenvName {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory, Position = 0)]
@@ -184,7 +175,7 @@ function Add-DotenvName {
 	}
 }
 
-function Remove-DotenvName {
+function Unregister-DotenvName {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory, Position = 0)]
