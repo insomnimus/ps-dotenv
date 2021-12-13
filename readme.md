@@ -8,6 +8,11 @@ PS-Dotenv is an unintrusive yet fully featured `dotenv` module for `Powershell`.
 -	Option to turn the module on and off on the fly.
 -	Option to add/remove custom filenames for auto sourcing of env files.
 
+## Use Case
+This module aims to provide the same functionality as [direnv](https://direnv.net/).
+
+Add `Update-Dotenv` in your `Prompt` function and as you navigate directories, Dotenv will source the appropriate env files in the current directory and its parents.
+
 ## Performance
 The parsing of the env files is done in `C#` with a hand-written parser.
 
@@ -79,3 +84,4 @@ function prompt {
 - `Set-DotenvLogLevel`: Sets the log level for the Dotenv module.
 - `Register-DotenvName`: Registers a file name that will be considered as an env file.
 - `Unregister-DotenvName`: Unregisters a name from the list of env file names.
+
