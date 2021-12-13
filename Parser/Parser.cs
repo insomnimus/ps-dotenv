@@ -34,6 +34,12 @@ namespace Dotenv.Parser {
 			return entry?.Value ?? Environment.GetEnvironmentVariable(key);
 		}
 
+		internal static string trimLF(string s) {
+			if (s.Length > 1 && s.Substring(s.Length - 2) == "\r\n") return s.Substring(0, s.Length - 2);
+			else if (s.Length > 0 && s[s.Length - 1] == '\n') return s.Substring(0, s.Length - 1);
+			else return s;
+		}
+
 		internal static char escaped(char c) => c switch {
 			'n' => '\n',
 			'r' => '\r',
@@ -191,7 +197,7 @@ namespace Dotenv.Parser {
 					case '\'':
 						if (aheadIs("'''")) {
 							for (int i = 0; i < 4; i++) read();
-							return buf.ToString();
+							return trimLF(buf.ToString());
 						}
 						buf.Append(ch);
 						break;
@@ -219,7 +225,7 @@ namespace Dotenv.Parser {
 					case EOF: return new ErrUnclosedQuote(ln, Quote.MultiDouble);
 					case '"' when this.aheadIs("\"\"\""):
 						for (var i = 0; i < 4; i++) read();
-						return buf.ToString();
+						return trimLF(buf.ToString());
 					case '\\':
 						read();
 						if (ch == EOF) return new ErrUnclosedQuote(ln, Quote.MultiDouble);
@@ -303,7 +309,7 @@ namespace Dotenv.Parser {
 			if (rhs.IsErr) return rhs.Err;
 
 			// Check for EOF or LF.
-			while (ch != EOF && ch != '\n') {
+			while (!(ch == EOF || ch == '\n' || ch == '#')) {
 				if (!char.IsWhiteSpace(ch)) return new ErrMissingNewline(line);
 				read();
 			}
