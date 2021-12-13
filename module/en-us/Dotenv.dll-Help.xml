@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Read-Dotenv</command:name>
+      <command:verb>Read</command:verb>
+      <command:noun>Dotenv</command:noun>
+      <maml:description>
+        <maml:para>Parses a file containing env variables according to the dotenv file format.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Parses a file or text containing env variables in accordance to the dotenv syntax.</maml:para>
+      <maml:para>Parsed values are not applied to the environment, the user is expected to apply them.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Read-Dotenv</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="0" aliases="none">
+          <maml:name>Path</maml:name>
+          <maml:description>
+            <maml:para>Path to a .env file.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>SkipErrors</maml:name>
+          <maml:description>
+            <maml:para>Skip syntax errors if any are encountered. The default behaviour is to stop parsing.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>Read-Dotenv</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="0" aliases="none">
+          <maml:name>Text</maml:name>
+          <maml:description>
+            <maml:para>The text input to parse.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>SkipErrors</maml:name>
+          <maml:description>
+            <maml:para>Skip syntax errors if any are encountered. The default behaviour is to stop parsing.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="0" aliases="none">
+        <maml:name>Path</maml:name>
+        <maml:description>
+          <maml:para>Path to a .env file.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>SkipErrors</maml:name>
+        <maml:description>
+          <maml:para>Skip syntax errors if any are encountered. The default behaviour is to stop parsing.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="0" aliases="none">
+        <maml:name>Text</maml:name>
+        <maml:description>
+          <maml:para>The text input to parse.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>System.String</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Dotenv.EnvEntry</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; $env:GOPATH = "D:\go"
+PS C:\&gt; $envfile = @'
+GOBIN = "$GOPATH/bin"
+CC = 'D:\clang\bin\clang.exe'
+'@
+PS C:\&gt; Read-Dotenv -Text $envfile
+
+Name  Value
+----  -----
+GOBIN D:\go/bin
+CC    D:\clang\bin\clang.exe</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+</helpItems>

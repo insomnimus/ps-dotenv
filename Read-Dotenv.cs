@@ -8,11 +8,11 @@ namespace Dotenv {
 	[OutputType(typeof(EnvEntry))]
 	public class ReadDotenvCmd: PSCmdlet {
 		[Parameter(
-		HelpMessage = "Path to a .env file.",
+		HelpMessage = "Path to a env file.",
 			Mandatory = true,
 			ParameterSetName = "file",
 			Position = 0,
-			ValueFromPipeline = true,
+			// ValueFromPipeline = true,
 			ValueFromPipelineByPropertyName = true)]
 		public string Path { get; set; }
 		[Parameter(

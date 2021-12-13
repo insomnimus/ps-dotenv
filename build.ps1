@@ -1,3 +1,4 @@
+#! /bin/env pwsh
 param(
 	[switch]$release
 )
@@ -26,8 +27,7 @@ if(test-path -pathType container $out) {
 	remove-item -recurse $out
 }
 
-$cfg = $release ? "release" : "debug"
-
+$cfg = if($release) { "release" } else { "debug" }
 build-project $cfg $out
 
 if($lastexitcode -eq 0) {

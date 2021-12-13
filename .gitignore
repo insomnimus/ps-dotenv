@@ -4,3 +4,4 @@ _*
 *.exe
 /dotenv
 /load.ps1
+/gen-repodocs.ps1

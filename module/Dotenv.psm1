@@ -100,15 +100,18 @@ function Update-Dotenv {
 	[void]$script:envs.removeAll($filter)
 	$dir = $pwd.path
 
-	do {
+	while($true) {
 		foreach($name in $script:NamesToSource) {
 			$x = join-path $dir $name
 			if(test-path -pathType leaf $x) {
 				script:source-dotenv $x
 			}
 		}
+		if([System.IO.Path]::EndsInDirectorySeparator($dir)) {
+			break
+		}
 		$dir = split-path -parent $dir
-	} while(![System.IO.Path]::EndsInDirectorySeparator($dir))
+	}
 }
 
 function Enable-Dotenv {
@@ -122,40 +125,6 @@ function Disable-Dotenv {
 	if($script:enabled) {
 		$script:envs.removeAll($script:unsource)
 		$script:enabled = $false
-	}
-}
-
-function Show-Dotenv {
-	[CmdletBinding()]
-	[OutputType([PSCustomObject])]
-	param(
-		[switch]$Enabled,
-		[switch]$Sourced,
-		[switch]$Vars,
-		[switch]$LogLevel,
-		[switch]$Names
-	)
-
-	$default = $MyInvocation.BoundParameters.count -eq 0
-	$members = if($default) {
-		"Enabled", "Sourced", "Names"
-	} else {
-		$MyInvocation.BoundParameters.keys | % { "$_" }
-	}
-
-	$typeData = @{
-		TypeName = "Dotenv.Status"
-		DefaultDisplayPropertySet = $members
-	}
-
-	update-typedata -force @typedata
-	[PSCustomObject]@{
-		PSTypeName = "Dotenv.Status"
-		Enabled = $script:enabled
-		Sourced = $script:envs.root
-		Vars = $script:envs.vars
-		LogLevel = $script:LogLevel
-		Names = $script:NamesToSource
 	}
 }
 
@@ -193,5 +162,44 @@ function Unregister-DotenvName {
 			})
 	} else {
 		write-warning "$filename is not in the list of names to source"
+	}
+}
+
+function Show-Dotenv {
+	[CmdletBinding()]
+	[OutputType([PSCustomObject])]
+	param(
+		[Parameter(HelpMessage = "Show if the module is enabled or not.")]
+		[switch]$Enabled,
+		[Parameter(HelpMessage = "Show the list of files that are currently sourced.")]
+		[switch]$Sourced,
+		[Parameter(HelpMessage = "Show the variables currently set by this module.")]
+		[switch]$Vars,
+		[Parameter(HelpMessage = "Show the currently configured log level for Dotenv.")]
+		[switch]$LogLevel,
+		[Parameter(HelpMessage = "Show the list of names that are being considered as env files.")]
+		[switch]$Names
+	)
+
+	$default = $MyInvocation.BoundParameters.count -eq 0
+	$members = if($default) {
+		"Enabled", "Sourced", "Names"
+	} else {
+		$MyInvocation.BoundParameters.keys | % { "$_" }
+	}
+
+	$typeData = @{
+		TypeName = "Dotenv.Status"
+		DefaultDisplayPropertySet = $members
+	}
+
+	update-typedata -force @typedata
+	[PSCustomObject]@{
+		PSTypeName = "Dotenv.Status"
+		Enabled = $script:enabled
+		Sourced = $script:envs.root
+		Vars = $script:envs.vars
+		LogLevel = $script:LogLevel
+		Names = $script:NamesToSource
 	}
 }
