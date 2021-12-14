@@ -17,16 +17,10 @@ namespace Dotenv.Parser {
 	}
 
 	public class ParseResult {
-		public List<EnvEntry> Entries { get; private set; }
-		public List<ParseError> Errors { get; private set; }
+		public List<EnvEntry> Entries { get; internal set; }
+		public List<ParseError> Errors { get; internal set; }
 		public bool HasError => Errors.Count > 0;
 
-		internal ParseResult(List<EnvEntry> entries, List<ParseError> errors) => (this.Entries, this.Errors) = (entries, errors);
 		internal ParseResult() => (this.Entries, this.Errors) = (new List<EnvEntry>() { }, new List<ParseError>() { });
-
-		internal void add(Result<EnvEntry> res) {
-			if (res.IsErr) this.Errors.Add(res.Err);
-			else this.Entries.Add(res.Ok);
-		}
 	}
 }

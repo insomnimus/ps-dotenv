@@ -13,7 +13,8 @@ Shows the current configuration of the Dotenv module.
 ## SYNTAX
 
 ```
-Show-Dotenv [-Enabled] [-Sourced] [-Vars] [-LogLevel] [-Names] [<CommonParameters>]
+Show-Dotenv [-Enabled] [-Sourced] [-Vars] [-LoggingPreference] [-Names] [-SkipErrors] [-IgnoreExportPrefix]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -34,21 +35,6 @@ Enabled Sourced Names
 
 ### -Enabled
 Show if the module is enabled or not.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -LogLevel
-Show the currently configured log level for Dotenv.
 
 ```yaml
 Type: SwitchParameter
@@ -94,6 +80,51 @@ Accept wildcard characters: False
 
 ### -Vars
 Show the variables currently set by this module.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -IgnoreExportPrefix
+Show if the export keyword is ignored before a variable name.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -LoggingPreference
+Show the currently configured logging preference for Dotenv.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SkipErrors
+Show if errors are skipped while parsing.
 
 ```yaml
 Type: SwitchParameter

@@ -23,7 +23,7 @@ Make sure you have all the requirements installed:
 
 -	`git`: To clone the repository.
 -	`dotnet cli` with `dotnet 6.0` or above: To build the project.
--	`Powershell` version 3.0 or above: To run the build script.
+-	`Powershell` version 6.0 or above: To run the build script.
 
 To build the project, run the commands below.
 
@@ -80,8 +80,6 @@ function prompt {
 - `Show-Dotenv`: Shows the current configuration of the Dotenv module.
 - `Update-Dotenv`: Makes the module check for env files to source if it is enabled.
 - `Read-Dotenv`: Parses a file containing env variables according to the dotenv file format.
-- `Get-DotenvLogLevel`: Gets the log level configured for Dotenv.
-- `Set-DotenvLogLevel`: Sets the log level for the Dotenv module.
 - `Register-DotenvName`: Registers a file name that will be considered as an env file.
 - `Unregister-DotenvName`: Unregisters a name from the list of env file names.
 

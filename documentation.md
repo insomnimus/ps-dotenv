@@ -1,3 +1,14 @@
+# Dotenv
+
+## Installation and Setup
+See the [readme](readme.md).
+
+## The `$Dotenv` variable.
+This variable is exported and holds the configuration for the entire module.
+You cannot remove or replace it but you can modify its properties, which take effect immediately.
+
+For example, instead of running `Disable-Dotenv`, you can run `$Dotenv.Enabled = $false`.
+
 ## Disable-Dotenv
 Disables the Dotenv module without removing it from the session.
 
@@ -54,21 +65,6 @@ Name  Value
 ----  -----
 GOBIN D:\go/bin
 CC    D:\clang\bin\clang.exe
-```
-
-## Get-DotenvLogLevel
-Gets the currently set log level for Dotenv.
-### Examples
-```powershell
-PS C:\> Get-DotenvLogLevel
-Debug
-```
-
-## Set-DotenvLogLevel
-Sets the log level for the Dotenv module.
-### Examples
-```powershell
-PS C:\> Set-DotenvLogLevel 'Info'
 ```
 
 ## Register-DotenvName

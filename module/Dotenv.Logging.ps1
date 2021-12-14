@@ -1,38 +1,20 @@
-enum LogLevel {
-	None
-	Info
-	Warning
-	Error
-	Debug
+class LoggingPreference {
+	[bool]$Info = $true
+	[bool]$Warning = $false
+	[bool]$Error = $true
+	[bool]$Debug = $true
 }
 
-[LogLevel]$LogLevel = [LogLevel]::Debug
-
-function :log {
-	param(
-		[parameter(mandatory, position = 0)]
-		[string]$msg,
-		[parameter(position = 1)]
-		[LogLevel]$lvl = [LogLevel]::Debug
-	)
-	if($lvl -gt $script:LogLevel) {
-		return
-	}
-	$msg = "[dotenv] $msg"
-	switch($lvl) {
-		[LogLevel]::Info { write-infrmation $msg; break }
-		[LogLevel]::Error { write-error $msg; break }
-		[LogLevel]::Warn { write-warning $msg; break }
-		[LogLevel]::Debug { write-debug $msg; break }
-	}
-}
+[LoggingPreference]$Log = [LoggingPreference]@{}
 
 function :info {
 	param(
 		[parameter(mandatory, position = 0)]
 		[string]$msg
 	)
-	script::log -lvl Info $msg
+	if($log.info) {
+		write-information "[Dotenv] $msg"
+	}
 }
 
 function :error {
@@ -40,7 +22,9 @@ function :error {
 		[parameter(mandatory, position = 0)]
 		[string]$msg
 	)
-	script::log -lvl Error $msg
+	if($log.error) {
+		write-error "[Dotenv] $msg"
+	}
 }
 
 function :warn {
@@ -48,7 +32,9 @@ function :warn {
 		[parameter(mandatory, position = 0)]
 		[string]$msg
 	)
-	script::log -lvl Warn $msg
+	if($log.warning) {
+		write-warning "[Dotenv] $msg"
+	}
 }
 
 function :debug {
@@ -56,20 +42,7 @@ function :debug {
 		[parameter(mandatory, position = 0)]
 		[string]$msg
 	)
-	script::log -lvl Debug $msg
-}
-
-function Set-DotenvLogLevel {
-	param(
-		[Parameter(Mandatory, Position = 0)]
-		[LogLevel]$Level
-	)
-	$script:LogLevel = $level
-}
-
-function Get-DotenvLogLevel {
-	[CmdletBinding()]
-	[OutputType([LogLevel])]
-	param()
-	$script:LogLevel
+	if($log.debug) {
+		write-debug "[Dotenv] $msg"
+	}
 }

@@ -14,12 +14,12 @@ Parses a file containing env variables according to the dotenv file format.
 
 ### file (Default)
 ```
-Read-Dotenv [-Path] <String> [-SkipErrors] [<CommonParameters>]
+Read-Dotenv [-Path] <String> [-SkipErrors] [-IgnoreExportPrefix] [<CommonParameters>]
 ```
 
 ### text
 ```
-Read-Dotenv [-Text] <String> [-SkipErrors] [<CommonParameters>]
+Read-Dotenv [-Text] <String> [-SkipErrors] [-IgnoreExportPrefix] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -89,6 +89,21 @@ Required: True
 Position: 0
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -IgnoreExportPrefix
+Ignore the `export ` prefix in env variables (POSIX shells have this keyword for exporting env variables).
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 

@@ -13,13 +13,15 @@ namespace Dotenv.Parser {
 		private int pos = 0;
 		private int readpos = 0;
 		private char ch;
-		private int line = 0;
+		private int line = 1;
 		private char peek => readpos >= input.Length ? EOF : input[readpos];
 		private List<EnvEntry> parsedVars = new List<EnvEntry>() { };
 		private StringComparison comparisonType;
+		private bool ignoreExport = false;
 
-		public Parser(string input) {
+		public Parser(string input, bool ignoreExport = true) {
 			this.input = input;
+			this.ignoreExport = ignoreExport;
 			this.read();
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
 				this.comparisonType = StringComparison.OrdinalIgnoreCase;
@@ -301,7 +303,17 @@ namespace Dotenv.Parser {
 
 			// Ignore whitespace as a separator.
 			this.skipAny(" \t");
-			if (ch != '=') return new ErrMissingEquals(ln);
+			if (ch != '=') {
+				// Ignore the `export` prefix if the option is set.
+				if (!this.ignoreExport || key.Ok != "export" || (ch != '_' && !char.IsLetter(ch))) {
+					return new ErrMissingEquals(ln);
+				} else {
+					key = this.parseLHS();
+					if (key.IsErr) return key.Err;
+					this.skipAny(" \t");
+					if (ch != '=') return new ErrMissingEquals(ln);
+				}
+			}
 			this.expect('=');
 			this.skipAny(" \t");
 
@@ -314,27 +326,26 @@ namespace Dotenv.Parser {
 				read();
 			}
 
-			var entry = new EnvEntry(key.Ok, rhs.Ok);
-			this.parsedVars.Add(entry);
-			return entry;
+			return new EnvEntry(key.Ok, rhs.Ok);
 		}
 
 		public ParseResult Parse(bool skipErrors = false) {
 			var items = new ParseResult();
 
-			while (ch != EOF) {
-				var res = this.parseEntry();
-				if (res == null) break;
-				items.add(res);
+			for (var res = this.parseEntry(); res != null && this.ch != EOF; res = this.parseEntry()) {
+				if (res.IsErr) items.Errors.Add(res.Err);
+				else this.parsedVars.Add(res.Ok);
+
 				if (res.IsErr && skipErrors) this.skipLine();
-				else if (res.IsErr) return items;
+				else if (res.IsErr) break;
 			}
 
+			items.Entries = this.parsedVars;
 			return items;
 		}
 
-		public static ParseResult Parse(string text, bool skipErrors = false) {
-			var p = new Parser(text);
+		public static ParseResult Parse(string text, bool skipErrors = false, bool ignoreExport = true) {
+			var p = new Parser(text, ignoreExport);
 			return p.Parse(skipErrors);
 		}
 	}

@@ -13,7 +13,7 @@ Registers a file name that will be considered as an env file.
 ## SYNTAX
 
 ```
-Register-DotenvName [-FileName] <String> [<CommonParameters>]
+Register-DotenvName -Name <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -30,8 +30,8 @@ PS C:\> Register-DotenvName ".myCustomName"
 
 ## PARAMETERS
 
-### -FileName
-{{ Fill FileName Description }}
+### -Name
+The name to register.
 
 ```yaml
 Type: String
@@ -39,7 +39,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

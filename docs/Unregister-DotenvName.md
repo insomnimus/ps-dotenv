@@ -13,7 +13,7 @@ Unregisters a name from the list of env file names.
 ## SYNTAX
 
 ```
-Unregister-DotenvName [-FileName] <String> [<CommonParameters>]
+Unregister-DotenvName -Name <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -28,8 +28,8 @@ PS C:\> Unregister-DotenvName ".env"
 
 ## PARAMETERS
 
-### -FileName
-{{ Fill FileName Description }}
+### -Name
+Name to unregister.
 
 ```yaml
 Type: String
@@ -37,7 +37,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

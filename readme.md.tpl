@@ -23,7 +23,7 @@ Make sure you have all the requirements installed:
 
 -	`git`: To clone the repository.
 -	`dotnet cli` with `dotnet 6.0` or above: To build the project.
--	`Powershell` version 3.0 or above: To run the build script.
+-	`Powershell` version 6.0 or above: To run the build script.
 
 To build the project, run the commands below.
 

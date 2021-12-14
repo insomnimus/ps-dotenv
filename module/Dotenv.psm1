@@ -1,3 +1,5 @@
+new-variable Dotenv -Option Constant -Value ([DotenvConfig]::new())
+
 [ScriptBlock]$filter = {
 	param($dotenv)
 	if(!$pwd.path.startswith($dotenv.root)) {
@@ -27,30 +29,41 @@ class DotenvEntry {
 		$this.value = $entry.value
 		set-item "env:$($entry.name)" $this.value
 	}
+
+	[void]unset() {
+		if($this.replaced) {
+			set-content "env:/$($this.name)" $this.replaced
+		} else {
+			remove-item "env:\$($this.name)" -errorAction SilentlyContinue
+		}
+	}
 }
 
 class Dotenv {
-	[string]$root
+	[string]$Root
+	[string]$Path
+	[string]$Name
 	[DotenvEntry[]]$vars
 
+	Dotenv([string]$path, [DotenvEntry[]]$vars) {
+		$this.vars = $vars
+		$this.path = $path
+		$this.name = split-path -leaf $path
+		$this.root = split-path -parent $path
+	}
+
 	[void]unsource() {
+		script::info "unsourcing $($this.path)"
 		foreach($x in $this.vars) {
-			$name = $x.name
-			if($x.replaced) {
-				set-content"env:/$name" $x.replaced
-			} else {
-				remove-item "env:/$name" -errorAction ignore
-			}
+			$x.unset()
 		}
 	}
 }
 
 [System.Collections.Generic.List[Dotenv]]$envs = [System.Collections.Generic.List[Dotenv]]::new(32)
 [string]$Lastdir = $PWD.path
-[bool]$enabled = $true
-[System.Collections.Generic.List[string]]$NamesToSource = [System.Collections.Generic.List[string]]@(".env")
 
-function Source-Dotenv {
+function :source-dotenv {
 	param(
 		[parameter(mandatory, position = 0)]
 		[string]$path
@@ -64,19 +77,18 @@ function Source-Dotenv {
 		return
 	}
 
-	$vars = read-dotenv $path -skipErrors | % { [DotenvEntry]::new($_) }
+	$vars = read-dotenv $path -skipErrors:$script:skipErrors -ignoreExportPrefix:$script:IgnoreExportPrefix `
+	| % { [DotenvEntry]::new($_) }
+
 	if($vars) {
 		script::debug "sourcing $path ($($vars.length) items)"
-		$script:envs.add([Dotenv]@{
-				root = $path
-				vars = $vars
-			})
+		$script:envs.add([Dotenv]::new($path, $vars))
 	} else {
 		script::debug "'$path' does not contain any variables, the file is skipped"
 	}
 }
 
-function should-update {
+function :should-update {
 	$pwd.path -ne $script:lastdir
 }
 
@@ -90,9 +102,9 @@ function Update-Dotenv {
 		return
 	}
 	if($force) {
-		script::info "unsourcing sourced env files"
+		script::info "unsourcing $($script:envs.count) env files"
 		$script:envs.removeAll($script:unsource)
-	} elseif(-not (should-update)) {
+	} elseif(-not (script::should-update)) {
 		return
 	}
 	$script:lastdir = $pwd.path
@@ -101,10 +113,10 @@ function Update-Dotenv {
 	$dir = $pwd.path
 
 	while($true) {
-		foreach($name in $script:NamesToSource) {
+		foreach($name in $script:names) {
 			$x = join-path $dir $name
 			if(test-path -pathType leaf $x) {
-				script:source-dotenv $x
+				script::source-dotenv $x
 			}
 		}
 		if([System.IO.Path]::EndsInDirectorySeparator($dir)) {
@@ -132,14 +144,13 @@ function Register-DotenvName {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory, Position = 0)]
-		[string]$FileName
+		[string]$Name
 	)
 
-	if($script:NamesToSource -contains $filename) {
-		write-information "filename already in watch"
+	if(script::contains $script:names $name) {
+		write-warning "$name is already registered"
 	} else {
-		$script:NamesToSource.add($filename)
-		write-information "added $filename as a .env file name to source"
+		$script:names += $name
 		script:update-dotenv -force
 	}
 }
@@ -148,20 +159,23 @@ function Unregister-DotenvName {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory, Position = 0)]
-		[string]$FileName
+		[string]$Name
 	)
 
-	if($script:NamesToSource.remove($filename)) {
-		write-information "removed $filename from the list of names to source"
-		$script:envs.removeAll({
+	if($script:NamesToSource.removeAll({
+				param($s)
+				if(script::eq $s $name) { $true }
+			})) {
+		write-information "removed $name from the list of names"
+		[void] $script:envs.removeAll({
 				param($dotenv)
-				if($dotenv.root.endswith($filename, $true, $null)) {
+				if(script::eq $name $dotenv.name) {
 					[void]$dotenv.unsource()
 					$true
 				}
 			})
 	} else {
-		write-warning "$filename is not in the list of names to source"
+		write-warning "$name is not in the list of names"
 	}
 }
 
@@ -175,10 +189,14 @@ function Show-Dotenv {
 		[switch]$Sourced,
 		[Parameter(HelpMessage = "Show the variables currently set by this module.")]
 		[switch]$Vars,
-		[Parameter(HelpMessage = "Show the currently configured log level for Dotenv.")]
-		[switch]$LogLevel,
+		[Parameter(HelpMessage = "Show the currently configured logging preference for Dotenv.")]
+		[switch]$LoggingPreference,
 		[Parameter(HelpMessage = "Show the list of names that are being considered as env files.")]
-		[switch]$Names
+		[switch]$Names,
+		[Parameter(HelpMessage = "Show if errors are skipped while parsing.")]
+		[switch]$SkipErrors,
+		[Parameter(HelpMessage = "Show if the export keyword is ignored before a variable name.")]
+		[switch]$IgnoreExportPrefix
 	)
 
 	$default = $MyInvocation.BoundParameters.count -eq 0
@@ -196,10 +214,27 @@ function Show-Dotenv {
 	update-typedata -force @typedata
 	[PSCustomObject]@{
 		PSTypeName = "Dotenv.Status"
-		Enabled = $script:enabled
-		Sourced = $script:envs.root
+		Enabled = $script:Enabled
+		LoggingPreference = $script:log
+		Sourced = $script:envs.path
 		Vars = $script:envs.vars
-		LogLevel = $script:LogLevel
-		Names = $script:NamesToSource
+		Names = $script:names
+		SkipErrors = $script:SkipErrors
+		IgnoreExportPrefix = $script:IgnoreExportPrefix
 	}
 }
+
+$exports = @{
+	Variable = "Dotenv"
+	Cmdlet = "Read-Dotenv"
+	Function = @(
+		"Update-Dotenv"
+		"Enable-Dotenv"
+		"Disable-Dotenv"
+		"Show-Dotenv"
+		"Register-DotenvName"
+		"Unregister-DotenvName"
+	)
+}
+
+Export-ModuleMember @exports
