@@ -8,7 +8,7 @@ schema: 2.0.0
 # Register-DotenvName
 
 ## SYNOPSIS
-Registers a file name that will be considered as an env file.
+Adds a new name to the list of env file names this module will check for.
 
 ## SYNTAX
 
@@ -17,21 +17,21 @@ Register-DotenvName [-Name] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Registers a file name that will be considered as an env file.
-
-By default, the only name considered is ".env".
+Adds a new name to the list of env file names this module will check for.
+Equivalent to `$Dotenv.AddName()`.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> Register-DotenvName ".myCustomName"
+PS C:\> Register-Dotenvname .myCustomEnv
 ```
 
 ## PARAMETERS
 
 ### -Name
-The name to register.
+The name to add.
+The name must be a valid filename and not a path.
 
 ```yaml
 Type: String

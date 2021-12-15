@@ -8,26 +8,26 @@ schema: 2.0.0
 # Disable-Dotenv
 
 ## SYNOPSIS
-Disables the Dotenv module without removing it from the session.
+Disables the module without removing it from the session.
 
 ## SYNTAX
 
 ```
-Disable-Dotenv [<CommonParameters>]
+Disable-Dotenv
 ```
 
 ## DESCRIPTION
-Disables the Dotenv module without removing it from the session.
-
-This will unsource any existing env variables parsed from env files.
-You can enable the module back with the Enable-Dotenv command.
+Disables the module without removing it from the session.
+Equivalent to `$Dotenv.Enabled = $true`.
 
 ## EXAMPLES
 
-## PARAMETERS
+### Example 1
+```powershell
+PS C:\> Disable-Dotenv
+```
 
-### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+## PARAMETERS
 
 ## INPUTS
 

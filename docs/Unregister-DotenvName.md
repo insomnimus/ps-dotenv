@@ -8,7 +8,7 @@ schema: 2.0.0
 # Unregister-DotenvName
 
 ## SYNOPSIS
-Unregisters a name from the list of env file names.
+Removes a name from the list of names this module will consider as an env file.
 
 ## SYNTAX
 
@@ -17,19 +17,20 @@ Unregister-DotenvName [-Name] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Unregisters a name from the list of env file names.
+Removes a name from the list of names this module will consider as an env file.
+Equivalent to `$Dotenv.RemoveName()`.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> Unregister-DotenvName ".env"
+PS C:\> Unregister-DotenvName .env
 ```
 
 ## PARAMETERS
 
 ### -Name
-Name to unregister.
+The name to remove.
 
 ```yaml
 Type: String

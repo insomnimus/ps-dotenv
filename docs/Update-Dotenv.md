@@ -8,18 +8,18 @@ schema: 2.0.0
 # Update-Dotenv
 
 ## SYNOPSIS
-Makes the module check for env files to source if it is enabled.
+Triggers the module to check for env files in the current and parent directories.
 
 ## SYNTAX
 
 ```
-Update-Dotenv [-force] [<CommonParameters>]
+Update-Dotenv [-Force] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Makes the module check for env files to source if it is enabled.
-
-This cmdlet is meant to be called automatically from inside the prompt function.
+Triggers the module to check for env files in the current and parent directories.
+This is the entrypoint to this module.
+This command is meant to be called automatically by your `Prompt` function.
 
 ## EXAMPLES
 
@@ -30,9 +30,8 @@ PS C:\> Update-Dotenv
 
 ## PARAMETERS
 
-### -force
-Forces the command to re-evaluate .env files found in the current directory and its parents.
-Setting this flag won't have an effect if the module level state is disabled (using Disable-Dotenv).
+### -Force
+Forces the module to reload every env file if any.
 
 ```yaml
 Type: SwitchParameter

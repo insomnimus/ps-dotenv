@@ -6,12 +6,11 @@
       <command:verb>Read</command:verb>
       <command:noun>Dotenv</command:noun>
       <maml:description>
-        <maml:para>Parses a file containing env variables according to the dotenv file format.</maml:para>
+        <maml:para>Parses an env file.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Parses a file or text containing env variables in accordance to the dotenv syntax.</maml:para>
-      <maml:para>Parsed values are not applied to the environment, the user is expected to apply them.</maml:para>
+      <maml:para>Parses an env file. The parsed variables are not sourced, the caller is expected to do it. You don't have to call this command, the module uses it under the hood.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -19,7 +18,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="0" aliases="none">
           <maml:name>Path</maml:name>
           <maml:description>
-            <maml:para>Path to a .env file.</maml:para>
+            <maml:para>Path to a env file.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -105,7 +104,7 @@
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="0" aliases="none">
         <maml:name>Path</maml:name>
         <maml:description>
-          <maml:para>Path to a .env file.</maml:para>
+          <maml:para>Path to a env file.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -167,17 +166,7 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; $env:GOPATH = "D:\go"
-PS C:\&gt; $envfile = @'
-GOBIN = "$GOPATH/bin"
-CC = 'D:\clang\bin\clang.exe'
-'@
-PS C:\&gt; Read-Dotenv -Text $envfile
-
-Name  Value
-----  -----
-GOBIN D:\go/bin
-CC    D:\clang\bin\clang.exe</dev:code>
+        <dev:code>PS C:\&gt; Read-Dotenv ./.env</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>

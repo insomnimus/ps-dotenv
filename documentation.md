@@ -21,13 +21,19 @@ These are its fields:
 -	`SkipErrors`: If set to true, errors encountered during parsing env files will cause the parser to skip to the next line instead of returning.
 
 ## Disable-Dotenv
+Disables the module without removing it from the session. Equivalent to `$Dotenv.Enabled = $true`.
 
 ## Enable-Dotenv
+Enables the module back. Equivalent to `$Dotenv.Enabled = $true`.
 
 ## Update-Dotenv
+Triggers the module to check for env files in the current and parent directories. This is the entrypoint to this module. This command is meant to be called automatically by your `Prompt` function.
 
 ## Read-Dotenv
+Parses an env file. The parsed variables are not sourced, the caller is expected to do it. You don't have to call this command, the module uses it under the hood.
 
 ## Register-DotenvName
+Adds a new name to the list of env file names this module will check for. Equivalent to `$Dotenv.AddName()`.
 
 ## Unregister-DotenvName
+Removes a name from the list of names this module will consider as an env file. Equivalent to `$Dotenv.RemoveName()`.

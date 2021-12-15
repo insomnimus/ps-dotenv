@@ -8,7 +8,7 @@ schema: 2.0.0
 # Read-Dotenv
 
 ## SYNOPSIS
-Parses a file containing env variables according to the dotenv file format.
+Parses an env file.
 
 ## SYNTAX
 
@@ -23,31 +23,21 @@ Read-Dotenv [-Text] <String> [-SkipErrors] [-IgnoreExportPrefix] [<CommonParamet
 ```
 
 ## DESCRIPTION
-Parses a file or text containing env variables in accordance to the dotenv syntax.
-
-Parsed values are not applied to the environment, the user is expected to apply them.
+Parses an env file.
+The parsed variables are not sourced, the caller is expected to do it.
+You don't have to call this command, the module uses it under the hood.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> $env:GOPATH = "D:\go"
-PS C:\> $envfile = @'
-GOBIN = "$GOPATH/bin"
-CC = 'D:\clang\bin\clang.exe'
-'@
-PS C:\> Read-Dotenv -Text $envfile
-
-Name  Value
-----  -----
-GOBIN D:\go/bin
-CC    D:\clang\bin\clang.exe
+PS C:\> Read-Dotenv ./.env
 ```
 
 ## PARAMETERS
 
 ### -IgnoreExportPrefix
-Ignore the `export ` prefix in env variables (POSIX shells have this keyword for exporting env variables).
+Ignore the \`export \` prefix in env variables (POSIX shells have this keyword for exporting env variables).
 
 ```yaml
 Type: SwitchParameter
@@ -62,7 +52,7 @@ Accept wildcard characters: False
 ```
 
 ### -Path
-Path to a .env file.
+Path to a env file.
 
 ```yaml
 Type: String
