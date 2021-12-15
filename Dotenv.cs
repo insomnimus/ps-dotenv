@@ -1,4 +1,5 @@
 using System;
+using Dotenv.Parsing;
 
 namespace Dotenv {
 	public enum Quote {
@@ -10,10 +11,17 @@ namespace Dotenv {
 
 	public class EnvEntry {
 		public string Name { get; set; }
-		public string Value { get; set; }
+		internal EnvStr value;
 
-		public EnvEntry(string name, string value) => (this.Name, this.Value) = (name, value);
+		public bool HasExpandableVar => this.value.hasExpandableVar;
 
-		public override string ToString() => $"{this.Name} = {this.Value}";
+
+		public string ExpandValue() => this.value.expand();
+
+		public void SetEnv() => System.Environment.SetEnvironmentVariable(this.Name, this.ExpandValue());
+
+		internal EnvEntry(string name, EnvStr value) => (this.Name, this.value) = (name, value);
+
+		public override string ToString() => $"{this.Name} = {this.ExpandValue()}";
 	}
 }

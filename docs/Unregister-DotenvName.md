@@ -13,7 +13,7 @@ Unregisters a name from the list of env file names.
 ## SYNTAX
 
 ```
-Unregister-DotenvName -Name <String> [<CommonParameters>]
+Unregister-DotenvName [-Name] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -35,9 +35,10 @@ Name to unregister.
 Type: String
 Parameter Sets: (All)
 Aliases:
+Accepted values: .env
 
 Required: True
-Position: Named
+Position: 0
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

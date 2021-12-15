@@ -24,11 +24,6 @@ You can enable the module back with the Enable-Dotenv command.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> Disable-Dotenv
-```
-
 ## PARAMETERS
 
 ### CommonParameters

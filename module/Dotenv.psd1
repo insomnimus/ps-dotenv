@@ -8,11 +8,10 @@
 
 	FunctionsToExport = @(
 		"Update-Dotenv"
-		"Enable-Dotenv"
-		"Disable-Dotenv"
-		"Show-Dotenv"
 		"Register-DotenvName"
 		"Unregister-DotenvName"
+		"Enable-Dotenv"
+		"Disable-Dotenv"
 	)
 	CmdletsToExport = @("Read-Dotenv")
 	VariablesToExport = @("Dotenv")
@@ -20,8 +19,5 @@
 
 	NestedModules = @(
 		"Dotenv.dll"
-		"Dotenv.Cmp.ps1"
-		"Dotenv.Logging.ps1"
-		"Dotenv.Config.ps1"
 	)
 }

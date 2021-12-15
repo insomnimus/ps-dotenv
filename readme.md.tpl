@@ -69,7 +69,7 @@ function prompt {
 }
 ```
 
-## Commands Documentation
+## Documentation
 
 -	[All in one page](documentation.md)
 -	[Individual command docs](docs/)

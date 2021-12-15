@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Dotenv;
 using Dotenv.Errors;
 
-namespace Dotenv.Parser {
+namespace Dotenv.Parsing {
 	internal class Result<T> {
 		public T Ok { get; set; }
 		public ParseError Err { get; set; }
@@ -20,6 +20,11 @@ namespace Dotenv.Parser {
 		public List<EnvEntry> Entries { get; internal set; }
 		public List<ParseError> Errors { get; internal set; }
 		public bool HasError => Errors.Count > 0;
+
+		internal void add(Result<EnvEntry> res) {
+			if (res.IsErr) this.Errors.Add(res.Err);
+			else this.Entries.Add(res.Ok);
+		}
 
 		internal ParseResult() => (this.Entries, this.Errors) = (new List<EnvEntry>() { }, new List<ParseError>() { });
 	}

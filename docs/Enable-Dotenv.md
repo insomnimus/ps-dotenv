@@ -22,11 +22,6 @@ This is useful because you can temporarily disable and enable the effects of thi
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> Enable-Dotenv
-```
-
 ## PARAMETERS
 
 ### CommonParameters

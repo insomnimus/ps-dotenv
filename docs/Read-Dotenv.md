@@ -46,6 +46,21 @@ CC    D:\clang\bin\clang.exe
 
 ## PARAMETERS
 
+### -IgnoreExportPrefix
+Ignore the `export ` prefix in env variables (POSIX shells have this keyword for exporting env variables).
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Path
 Path to a .env file.
 
@@ -89,21 +104,6 @@ Required: True
 Position: 0
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
-Accept wildcard characters: False
-```
-
-### -IgnoreExportPrefix
-Ignore the `export ` prefix in env variables (POSIX shells have this keyword for exporting env variables).
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
 Accept wildcard characters: False
 ```
 

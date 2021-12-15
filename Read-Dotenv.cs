@@ -1,6 +1,6 @@
 using System;
 using System.Management.Automation;
-using Dotenv.Parser;
+using Dotenv.Parsing;
 using Dotenv.Errors;
 
 namespace Dotenv {
@@ -37,7 +37,7 @@ namespace Dotenv {
 		};
 
 		protected override void ProcessRecord() {
-			var res = Parser.Parser.Parse(this.data, this.SkipErrors, this.IgnoreExportPrefix);
+			var res = Parser.Parse(this.data, this.SkipErrors, this.IgnoreExportPrefix);
 			foreach (var e in res.Entries) this.WriteObject(e);
 			foreach (var e in res.Errors) this.WriteError(new ErrorRecord(e, "Dotenv.ParseError", ErrorCategory.ParserError, null));
 		}

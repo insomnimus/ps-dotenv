@@ -5,3 +5,5 @@ _*
 /dotenv
 /load.ps1
 /gen-repodocs.ps1
+/ver.ps1
+/move-module.ps1

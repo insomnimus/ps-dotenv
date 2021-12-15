@@ -9,77 +9,25 @@ You cannot remove or replace it but you can modify its properties, which take ef
 
 For example, instead of running `Disable-Dotenv`, you can run `$Dotenv.Enabled = $false`.
 
+## Configuration
+The `$Dotenv` variable is how you configure the modules behaviour.
+These are its fields:
+
+-	`Enabled`: Turns the module on and off.
+-	`LoggingPreference`: Configures how the logs are written, you can tab through its fields.
+-	`Parallel`: If set to true, everytime `Update-Dotenv` is called, it will be done in a new thread therefore will not block.
+-	`Names`: Controls which names are considered env files. You should either call its methods `AddName()` and `RemoveName()` or use the cmdlets `Register-DotenvName` and `Unregister-DotenvName`.
+-	`IgnoreExportPrefix`: If set to true, the `export` keyword before a variable name will be ignored (this is common in *NIX systems).
+-	`SkipErrors`: If set to true, errors encountered during parsing env files will cause the parser to skip to the next line instead of returning.
+
 ## Disable-Dotenv
-Disables the Dotenv module without removing it from the session.
-
-
-This will unsource any existing env variables parsed from env files. You can enable the module back with the Enable-Dotenv command.
-### Examples
-```powershell
-PS C:\> Disable-Dotenv
-```
 
 ## Enable-Dotenv
-Enables the Dotenv module. This is useful because you can temporarily disable and enable the effects of this module without changing your profile.
-### Examples
-```powershell
-PS C:\> Enable-Dotenv
-```
-
-## Show-Dotenv
-Shows the current configuration of the Dotenv module.
-### Examples
-```powershell
-PS C:\> Show-Dotenv
-
-Enabled Sourced Names
-------- ------- -----
-   True         {.env}
-```
 
 ## Update-Dotenv
-Makes the module check for env files to source if it is enabled.
-
-
-This cmdlet is meant to be called automatically from inside the prompt function.
-### Examples
-```powershell
-PS C:\> Update-Dotenv
-```
 
 ## Read-Dotenv
-Parses a file or text containing env variables in accordance to the dotenv syntax.
-
-
-Parsed values are not applied to the environment, the user is expected to apply them.
-### Examples
-```powershell
-PS C:\> $env:GOPATH = "D:\go"
-PS C:\> $envfile = @'
-GOBIN = "$GOPATH/bin"
-CC = 'D:\clang\bin\clang.exe'
-'@
-PS C:\> Read-Dotenv -Text $envfile
-
-Name  Value
-----  -----
-GOBIN D:\go/bin
-CC    D:\clang\bin\clang.exe
-```
 
 ## Register-DotenvName
-Registers a file name that will be considered as an env file.
-
-
-By default, the only name considered is ".env".
-### Examples
-```powershell
-PS C:\> Register-DotenvName ".myCustomName"
-```
 
 ## Unregister-DotenvName
-Unregisters a name from the list of env file names.
-### Examples
-```powershell
-PS C:\> Unregister-DotenvName ".env"
-```

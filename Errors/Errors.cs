@@ -13,6 +13,9 @@ namespace Dotenv.Errors {
 	public class ErrInvalidName: ParseError {
 		public ErrInvalidName(int line)
 	: base(line, "invalid variable name; names must start with a letter or a '_'") { }
+
+		public ErrInvalidName(int line, string msg)
+		: base(line, msg) { }
 	}
 
 	public class ErrMissingEquals: ParseError {

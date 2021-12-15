@@ -69,17 +69,30 @@ function prompt {
 }
 ```
 
-## Commands Documentation
+## Documentation
 
 -	[All in one page](documentation.md)
 -	[Individual command docs](docs/)
 
 ## Commands Overview
-- `Disable-Dotenv`: Disables the Dotenv module without removing it from the session.
-- `Enable-Dotenv`: Enables the Dotenv module.
-- `Show-Dotenv`: Shows the current configuration of the Dotenv module.
-- `Update-Dotenv`: Makes the module check for env files to source if it is enabled.
-- `Read-Dotenv`: Parses a file containing env variables according to the dotenv file format.
-- `Register-DotenvName`: Registers a file name that will be considered as an env file.
-- `Unregister-DotenvName`: Unregisters a name from the list of env file names.
+- `Disable-Dotenv`: 
+Disable-Dotenv 
+
+- `Enable-Dotenv`: 
+Enable-Dotenv 
+
+- `Update-Dotenv`: 
+Update-Dotenv [-Force] [<CommonParameters>]
+
+- `Read-Dotenv`: 
+Read-Dotenv [-Path] <string> [-SkipErrors] [-IgnoreExportPrefix] [<CommonParameters>]
+
+Read-Dotenv [-Text] <string> [-SkipErrors] [-IgnoreExportPrefix] [<CommonParameters>]
+
+- `Register-DotenvName`: 
+Register-DotenvName [-Name] <string> [<CommonParameters>]
+
+- `Unregister-DotenvName`: 
+Unregister-DotenvName [-Name] <string> [<CommonParameters>]
+
 

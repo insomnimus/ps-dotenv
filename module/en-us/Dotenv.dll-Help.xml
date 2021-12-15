@@ -29,6 +29,17 @@
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>IgnoreExportPrefix</maml:name>
+          <maml:description>
+            <maml:para>Ignore the `export ` prefix in env variables (POSIX shells have this keyword for exporting env variables).</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>SkipErrors</maml:name>
           <maml:description>
             <maml:para>Skip syntax errors if any are encountered. The default behaviour is to stop parsing.</maml:para>
@@ -55,6 +66,17 @@
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>IgnoreExportPrefix</maml:name>
+          <maml:description>
+            <maml:para>Ignore the `export ` prefix in env variables (POSIX shells have this keyword for exporting env variables).</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>SkipErrors</maml:name>
           <maml:description>
             <maml:para>Skip syntax errors if any are encountered. The default behaviour is to stop parsing.</maml:para>
@@ -68,6 +90,18 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>IgnoreExportPrefix</maml:name>
+        <maml:description>
+          <maml:para>Ignore the `export ` prefix in env variables (POSIX shells have this keyword for exporting env variables).</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="0" aliases="none">
         <maml:name>Path</maml:name>
         <maml:description>
