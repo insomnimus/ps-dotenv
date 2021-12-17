@@ -1,6 +1,6 @@
 New-Variable -Option Constant Dotenv ([Dotenv.Daemon]::new())
 
-[string]$lastdir = $pwd.path
+[string]$lastdir = $pwd.providerpath
 
 function Clear-DotenvJobs {
 	Get-Job -State Completed `
@@ -14,10 +14,10 @@ function Update-Dotenv {
 		[Parameter(HelpMessage = "Forces the module to reload every env file if any.")]
 		[switch]$Force
 	)
-	if($pwd.path -eq $script:lastdir -and -not $force) {
+	if($pwd.providerpath -eq $script:lastdir -and -not $force) {
 		return
 	}
-	$script:lastdir = $pwd.path
+	$script:lastdir = $pwd.providerpath
 	if($script:Dotenv.Parallel) {
 		Clear-DotenvJobs
 		Start-ThreadJob -Name "Dotenv" -ArgumentList $script:Dotenv, $force {
@@ -28,13 +28,13 @@ function Update-Dotenv {
 			if($force) {
 				$daemon.Clear()
 			}
-			$Daemon.Update($pwd.path)
+			$Daemon.Update($pwd.providerpath)
 		}
 	} else {
 		if($force) {
 			$script:dotenv.clear()
 		}
-		$script:dotenv.update($pwd.path)
+		$script:dotenv.update($pwd.providerpath)
 	}
 }
 

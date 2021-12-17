@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Dotenv;
+
 public readonly struct EnvVar {
 	public string Name { get; }
 	public string Value { get; }
