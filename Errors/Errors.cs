@@ -60,3 +60,14 @@ public class ErrMissingRBrace: ParseError {
 	public ErrMissingRBrace(int line)
 	: base(line, "the closing brace for the ${} interpolated variable is missing") { }
 }
+
+public class VarUnsetException: Exception {
+	public string VariableName { get; private set; }
+	public string Msg { get; private set; }
+
+	public VarUnsetException(string name, string msg)
+	: base($"{name}: {msg ?? "the value is not set"}") {
+		this.VariableName = name;
+		this.Msg = msg;
+	}
+}

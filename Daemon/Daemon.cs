@@ -7,6 +7,7 @@ using Dotenv.Errors;
 using Dotenv.Logging;
 
 namespace Dotenv;
+
 public class Daemon {
 	// Members that are used in the module but not here.
 	public bool Async = true;
@@ -116,7 +117,11 @@ public class Daemon {
 				var data = File.ReadAllText(f);
 				var res = Parser.Parse(data, this.SkipErrors, this.IgnoreExportPrefix);
 				if (res.Entries.Count > 0) {
-					this._sourced.Add(new DotenvFile(f, res.Entries));
+					try {
+						this._sourced.Add(new DotenvFile(f, res.Entries));
+					} catch (VarUnsetException e) {
+						this.log.Error(e.ToString(), f);
+					}
 				}
 				foreach (var e in res.Errors) this.log.Error(e.ToString(), f);
 			} catch (Exception e) {

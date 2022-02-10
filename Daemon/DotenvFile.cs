@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Dotenv.Errors;
 
 namespace Dotenv;
 
@@ -28,11 +29,18 @@ public class DotenvFile {
 		this.Name = Path.GetFileName(path);
 		this._vars = new List<EnvVar>(entries.Count) { };
 
-		foreach (var e in entries) {
-			var replaced = Environment.GetEnvironmentVariable(e.Name);
-			var expanded = e.ExpandValue();
-			Environment.SetEnvironmentVariable(e.Name, expanded);
-			this._vars.Add(new EnvVar(e.Name, expanded, replaced));
+		try {
+			foreach (var e in entries) {
+				var replaced = Environment.GetEnvironmentVariable(e.Name);
+				var expanded = e.ExpandValue();
+				Environment.SetEnvironmentVariable(e.Name, expanded);
+				this._vars.Add(new EnvVar(e.Name, expanded, replaced));
+			}
+		} catch (VarUnsetException e) {
+			for (var i = this._vars.Count - 1; i >= 0; i--) {
+				this._vars[i].unset();
+			}
+			throw e;
 		}
 	}
 

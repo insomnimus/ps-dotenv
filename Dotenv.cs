@@ -14,9 +14,6 @@ public class EnvEntry {
 	public string Name { get; set; }
 	internal EnvStr value;
 
-	public bool HasExpandableVar => this.value.hasExpandableVar;
-
-
 	public string ExpandValue() => this.value.expand();
 
 	public void SetEnv() => System.Environment.SetEnvironmentVariable(this.Name, this.ExpandValue());

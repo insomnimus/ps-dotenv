@@ -14,7 +14,7 @@ function Update-Dotenv {
 		[Parameter(HelpMessage = "Forces the module to reload every env file if any.")]
 		[switch]$Force
 	)
-	if($pwd.providerpath -eq $script:lastdir -and -not $force) {
+	if(!$force -and $pwd.providerpath -eq $script:lastdir ) {
 		return
 	}
 	$script:lastdir = $pwd.providerpath

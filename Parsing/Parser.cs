@@ -252,9 +252,9 @@ public class Parser {
 		}
 	}
 
-	internal Result<EnvStr> parseRHS() => ch switch {
+	internal Result<EnvStr> parseRHS() => this.ch switch {
 		'\n' => new EnvStr(""),
-		'\r' when peek == '\n' => new EnvStr(""),
+		'\r' when this.peek == '\n' => new EnvStr(""),
 		'"' when this.aheadIs("\"\"\"") => this.readMultiDouble(),
 		'"' => this.readDoubleQuote(),
 		'\'' when this.aheadIs("'''") => this.readMultiSingle(),
@@ -264,34 +264,92 @@ public class Parser {
 
 	internal Result<StrFragment> parseExpand() {
 		this.expect('$');
-		Result<string> res;
-		if (ch == '{') res = readBracedExpand();
-		else if (ch == '_' || char.IsLetter(ch)) res = this.readNormalExpand();
-		else {
-			read();
-			return new StrFragment("$", false);
+
+		if (this.ch == '{') {
+			var res = this.readBracedExpand();
+			if (res.IsErr) return res.Err;
+			return new StrFragment(res.Ok);
+		} else if (this.ch == '_' || char.IsLetter(this.ch)) {
+			return new StrFragment(this.readNormalExpand());
+		} else {
+			this.read();
+			return new StrFragment("$");
 		}
-		if (res.IsErr) return res.Err;
-		else if (res.Ok.Length == 0) return new ErrInvalidName(line, "the environment variable name can't be empty");
-		else return new StrFragment(res.Ok, true);
 	}
 
-	internal string readNormalExpand() {
+	internal ExpandStr readNormalExpand() {
 		var start = pos;
-		while (ch == '_' || char.IsLetter(ch) || char.IsDigit(ch)) read();
+		while (ch == '_' || char.IsLetterOrDigit(ch)) read();
 		return input.Substring(start, pos - start);
 	}
 
-	internal Result<string> readBracedExpand() {
-		var ln = line;
+	internal Result<ExpandStr> readBracedExpand() {
+		var ln = this.line;
 		this.expect('{');
-		var start = pos;
-		while (ch != '}') {
-			if (ch == '\n' || (ch == '\r' && peek == '\n')) return new ErrMissingRBrace(ln);
-			read();
+		var start = this.pos;
+		var op = ExpansionType.Normal;
+
+		while (this.ch != '}') {
+			switch (this.ch) {
+				case '+':
+					op = ExpansionType.ReplaceIfExists;
+					break;
+				case '-':
+					op = ExpansionType.DefaultValue;
+					break;
+				case '?':
+					op = ExpansionType.MustExist;
+					break;
+				case EOF:
+				case '\n':
+				case '\r':
+					return new ErrMissingRBrace(ln);
+				default:
+					if (this.ch != '_' && !char.IsLetterOrDigit(this.ch)) return new ErrInvalidName(ln);
+					break;
+			}
+			this.read();
+			if (op != ExpansionType.Normal) break;
 		}
+
+		var left = this.input.Substring(start, this.pos - start - (op == ExpansionType.Normal ? 0 : 1));
+		var pieces = new EnvStr();
+
+		if (op != ExpansionType.Normal) {
+			var buf = new StringBuilder();
+
+			while (this.ch != '}') {
+				var mustRead = true;
+				switch (this.ch) {
+					case '$':
+						mustRead = false;
+						var res = this.parseExpand();
+						if (res.IsErr) return res.Err;
+
+						if (buf.Length > 0) pieces.add(buf.ToString());
+						buf.Clear();
+						pieces.add(res.Ok);
+						break;
+					case EOF:
+					case '\n':
+						return new ErrMissingRBrace(ln);
+					case '\\':
+						read();
+						if (ch == EOF) return new ErrMissingRBrace(ln);
+						buf.Append(escaped(this.ch));
+						break;
+					default:
+						buf.Append(this.ch);
+						break;
+				};
+
+				if (mustRead) this.read();
+			}
+			if (buf.Length > 0) pieces.add(buf.ToString());
+		}
+
 		this.expect('}');
-		return input.Substring(start, pos - 1 - start);
+		return new ExpandStr(left, pieces, op);
 	}
 
 	internal Result<EnvEntry> parseEntry() {
