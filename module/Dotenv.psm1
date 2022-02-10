@@ -1,4 +1,4 @@
-New-Variable -Option Constant Dotenv ([Dotenv.Daemon]::new())
+New-Variable -Option ReadOnly Dotenv ([Dotenv.Daemon]::new())
 
 [string]$lastdir = $pwd.providerpath
 

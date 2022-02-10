@@ -7,6 +7,7 @@ PS-Dotenv is an unintrusive yet fully featured `dotenv` module for `Powershell`.
 -	Logging with configurable log levels.
 -	Option to turn the module on and off on the fly.
 -	Option to add/remove custom filenames for auto sourcing of env files.
+-	A subset of bash-like parameter expansion: `$val`, `${val}`, `${val?error}`, `${val+replacement}` and `${val-default}`.
 
 ## Use Case
 This module aims to provide the same functionality as [direnv](https://direnv.net/).
@@ -73,6 +74,7 @@ function prompt {
 
 -	[All in one page](documentation.md)
 -	[Individual command docs](docs/)
+-	[Syntax](syntax.md)
 
 ## Commands Overview
 - `Read-Dotenv`: Parses an env file. 
