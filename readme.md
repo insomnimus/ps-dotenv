@@ -17,7 +17,8 @@ Add `Update-Dotenv` in your `Prompt` function and as you navigate directories, D
 ## Performance
 The parsing of the env files is done in `C#` with a hand-written parser.
 
-There are no benchmarks yet but the author notes that nothing feels different when the module is enabled or disabled except that the `.env` files are sourced.
+Dotenv, when there are env files under $PWD or its parents, adds approximately 2 milliseconds to the prompt, which itself takes about 5 milliseconds.
+If no env files are detected, there's pretty much no overhead.
 
 ## Building the Project
 Make sure you have all the requirements installed:
@@ -42,6 +43,12 @@ For the env files to be automatically sourced, you'll need to configure your pro
 
 You don't need to check if the current directory changed or if there are files that must be loaded since `Dotenv` takes care of that for you by keeping its own state.
 If you don't have a powershell profile setup yet, please read [this article from Microsoft](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.2) first.
+
+> Important: Dotenv needs to be manually imported because it requires no user interaction (modules are imported when they are first used by the user).
+
+First, add this in your profile (don't forget to replace `C:\example\dotenv` with the actual path to the folder you built in above stesps):
+
+`Import-Module C:\example\dotenv`
 
 Depending on if you have a custom prompt follow one of the following steps:
 
