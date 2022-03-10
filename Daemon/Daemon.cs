@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Dotenv.MemoryBuffer;
 using Dotenv.Parsing;
 using Dotenv.Errors;
@@ -9,6 +10,25 @@ using Dotenv.Logging;
 namespace Dotenv;
 
 public class Daemon {
+	public Daemon(string[] authorized = null, bool enabled = false, bool safe = true, bool quiet = false) {
+		this.Quiet = quiet;
+		this._enabled = enabled;
+		this._safe = safe;
+		var (comparison, comparer) = Environment.OSVersion.Platform switch {
+			PlatformID.Unix or PlatformID.MacOSX => (StringComparison.Ordinal, StringComparer.Ordinal),
+			_ => (StringComparison.OrdinalIgnoreCase, StringComparer.OrdinalIgnoreCase),
+		};
+		this.strComparison = comparison;
+		var auth = new HashSet<string>(comparer);
+		this._warned = new HashSet<string>(comparer);
+		if (authorized is not null) {
+			foreach (var f in authorized) {
+				auth.Add(Path.GetFullPath(f));
+			}
+		}
+		this._authorized = auth;
+	}
+
 	// Members that are used in the module but not here.
 	public bool Async = true;
 
@@ -24,14 +44,20 @@ public class Daemon {
 		get => this.log.Preference;
 		set => this.log.Preference = value;
 	}
-
-	public Daemon() {
-		this.strComparison = Environment.OSVersion.Platform switch {
-			PlatformID.Unix => StringComparison.Ordinal,
-			PlatformID.MacOSX => StringComparison.Ordinal,
-			_ => StringComparison.OrdinalIgnoreCase,
-		};
+	private HashSet<string> _authorized;
+	public ImmutableArray<string> AuthorizedFiles => this._authorized.ToImmutableArray();
+	private bool _safe = true;
+	public bool SafeMode {
+		get => this._safe;
+		set {
+			if (value != this._safe) {
+				this._safe = value;
+				this.Update(this.lastdir);
+			}
+		}
 	}
+	public bool Quiet = false;
+	private HashSet<string> _warned;
 
 	public List<string> Names {
 		get => this._names;
@@ -69,13 +95,17 @@ public class Daemon {
 		if (!this._enabled) return;
 		this.Clear();
 		this._enabled = false;
+		this._warned.Clear();
 	}
 
-	public void Clear() => this._sourced.RemoveAll(x => {
-		this.log.Info("unsourcing", x.FilePath);
-		x.Unsource();
-		return true;
-	});
+	public void Clear() {
+		this._sourced.RemoveAll(x => {
+			this.log.Info("unsourcing", x.FilePath);
+			x.Unsource();
+			return true;
+		});
+		this._warned.Clear();
+	}
 
 	public void Update(string pwd) {
 		this.log.Debug($"update called in {pwd}");
@@ -90,6 +120,11 @@ public class Daemon {
 			this.log.Debug($"unsourcing {x.FilePath}");
 			x.Unsource();
 			return true;
+		});
+
+		this._warned.RemoveWhere(x => {
+			var parent = Path.GetDirectoryName(x);
+			return !pwd.StartsWith(parent, this.strComparison);
 		});
 
 		var files = new List<string>(32) { };
@@ -110,8 +145,17 @@ public class Daemon {
 
 	private void sourceFiles(List<string> files) {
 		if (files is null || files.Count == 0) return;
+		var warned = false;
 
 		foreach (var f in files) {
+			if (this._safe && !this._authorized.Contains(f)) {
+				if (!this.Quiet && this._warned.Add(f)) {
+					this.log.Warn("unauthorized file not sourced while safe mode is on", f);
+					warned = true;
+					System.Console.WriteLine($"dotenv info: {f} is not authorized, authorize it with `Approve-DotenvFile` or disable the safe mode");
+				}
+				continue;
+			}
 			try {
 				this.log.Info("sourcing file", f);
 				var data = File.ReadAllText(f);
@@ -128,6 +172,8 @@ public class Daemon {
 				this.log.Exception(e, f);
 			}
 		}
+
+		if (warned) System.Console.WriteLine("You can turn this message off by setting `$Dotenv.Quiet = $true`");
 	}
 
 	public bool AddName(string name) {
@@ -147,5 +193,24 @@ public class Daemon {
 		this.Clear();
 		this.Update(this.lastdir);
 		return true;
+	}
+
+	public bool Authorize(string path, bool update = false) {
+		var fullpath = Path.GetFullPath(path);
+		var ok = this._authorized.Add(fullpath);
+		this._warned.Remove(fullpath);
+		if (ok && this.SafeMode) {
+			this.Update(this.lastdir);
+		}
+		return ok;
+	}
+
+	public bool Unauthorize(string path, bool update = false) {
+		var fullpath = Path.GetFullPath(path);
+		var ok = this._authorized.Remove(fullpath);
+		if (ok && this.SafeMode && update) {
+			this.Update(this.lastdir);
+		}
+		return ok;
 	}
 }

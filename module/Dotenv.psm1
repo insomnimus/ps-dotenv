@@ -1,5 +1,4 @@
 New-Variable -Option ReadOnly Dotenv ([Dotenv.Daemon]::new())
-
 [string]$lastdir = $pwd.providerpath
 
 function Clear-DotenvJobs {
@@ -85,6 +84,56 @@ function Disable-Dotenv {
 	$script:Dotenv.Enabled = $false
 }
 
+function Approve-DotenvFile {
+	[CmdletBinding()]
+	param(
+		[Parameter(
+			Mandatory,
+			Position = 0,
+			HelpMessage = "Path to an env file to allow."
+		)]
+		[string[]]$Path
+	)
+	$yes = $false
+	foreach($f in $path) {
+		$f = [System.IO.Path]::GetFullPath($f, $pwd.providerpath)
+		if($script:Dotenv.Authorize($f, $false)) {
+			write-information "allowed $f"
+			$yes = $true
+		} else {
+			write-warning "$f is already allowed"
+		}
+	}
+	if($yes) {
+		$script:Dotenv.Update($pwd.providerpath)
+	}
+}
+
+function Deny-DotenvFile {
+	[CmdletBinding()]
+	param(
+		[Parameter(
+			Mandatory,
+			Position = 0,
+			HelpMessage = "Path to an env file to deny."
+		)]
+		[string[]]$Path
+	)
+	$yes = $false
+	foreach($f in $path) {
+		$f = [System.IO.Path]::GetFullPath($f, $pwd.providerpath)
+		if($script:Dotenv.Unauthorize($f, $false)) {
+			write-information "denied $f"
+			$yes = $true
+		} else {
+			write-warning "$f is not allowed"
+		}
+	}
+	if($yes) {
+		$script:Dotenv.Update($pwd.providerpath)
+	}
+}
+
 $exports = @{
 	Function = @(
 		"Update-Dotenv"
@@ -92,6 +141,8 @@ $exports = @{
 		"Unregister-DotenvName"
 		"Enable-Dotenv"
 		"Disable-Dotenv"
+		"Approve-DotenvFile"
+		"Deny-DotenvFile"
 	)
 	Variable = "Dotenv"
 	Cmdlet = "Read-Dotenv"

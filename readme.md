@@ -88,6 +88,8 @@ function prompt {
 - `Disable-Dotenv`: Disables the module without removing it from the session. 
 - `Enable-Dotenv`: Enables the module back. 
 - `Update-Dotenv`: Triggers the module to check for env files in the current and parent directories. 
+- `Approve-DotenvFile`: Authorizes a file for the module. 
+- `Deny-DotenvFile`: Unauthorizes an env file. 
 - `Register-DotenvName`: Adds a new name to the list of env file names this module will check for. 
 - `Unregister-DotenvName`: Removes a name from the list of names this module will consider as an env file. 
 
