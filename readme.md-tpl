@@ -9,6 +9,8 @@ PS-Dotenv is an unintrusive yet fully featured `dotenv` module for `Powershell`.
 -	Option to add/remove custom filenames for auto sourcing of env files.
 -	A subset of bash-like parameter expansion: `$val`, `${val}`, `${val?error}`, `${val+replacement}` and `${val-default}`.
 - Opt-in safe mode where files have to be explicitly allowd.
+-	Smart loading and unloading env variables: you won't lose the previously set values upon unloading, the "replaced" values are remembered and kindly reset to their original values.
+-	It just works the way you'd expect it to.
 
 ## Use Case
 This module aims to provide the same functionality as [direnv](https://direnv.net/).
