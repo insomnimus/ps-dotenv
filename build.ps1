@@ -1,4 +1,4 @@
-#! /bin/env pwsh
+#!/usr/local/bin/env pwsh
 param(
 	[switch]$release
 )
