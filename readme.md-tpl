@@ -47,11 +47,14 @@ For the env files to be automatically sourced, you'll need to configure your pro
 You don't need to check if the current directory changed or if there are files that must be loaded since `Dotenv` takes care of that for you by keeping its own state.
 If you don't have a powershell profile setup yet, please read [this article from Microsoft](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.2) first.
 
-> Important: Dotenv needs to be manually imported because it requires no user interaction (modules are imported when they are first used by the user).
+> Important: Dotenv is disabled by default. You need to enable it with `Enable-Dotenv` in your powershell profile.
 
-First, add this in your profile (don't forget to replace `C:\example\dotenv` with the actual path to the folder you built in above stesps):
+First, add this in your profile (don't forget to replace `C:\example\dotenv` with the actual path to the folder you built in above steps, or if Dotenv is in your module directory, replace the path with `Dotenv`):
 
-`Import-Module C:\example\dotenv`
+```powershell
+Import-Module C:\example\dotenv
+Enable-Dotenv # this is important, by default the module is disabled
+```
 
 Depending on if you have a custom prompt follow one of the following steps:
 
