@@ -5,35 +5,34 @@ online version:
 schema: 2.0.0
 ---
 
-# Approve-DotenvFile
+# Remove-DotenvPattern
 
 ## SYNOPSIS
-Whitelists a particular env file for dotenv.
+Removes a pattern from the dotenv whitelist.
 
 ## SYNTAX
 
 ```
-Approve-DotenvFile [-Path] <String[]> [<CommonParameters>]
+Remove-DotenvPattern [-Pattern] <String[]> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Whitelists a particular env file for dotenv.
+Removes an entry from the Dotenv whitelist.
 This only has an effect with the safe mode enabled.
-With the safe mode, files not explicitly allowed by you will not be sourced.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> Approve-DotenvFile ~\.env
+PS C:\> Remove-DotenvPattern "$HOME/**"
 ```
 
-This example authorizes the file located at `~\.env`.
+No description.
 
 ## PARAMETERS
 
-### -Path
-Path to an env file to allow.
+### -Pattern
+A pattern to remove from the whitelisted patterns.
 
 ```yaml
 Type: String[]

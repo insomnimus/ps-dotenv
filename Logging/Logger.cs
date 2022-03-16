@@ -2,9 +2,10 @@ using System;
 using Dotenv.MemoryBuffer;
 
 namespace Dotenv.Logging;
+
 public class Logger {
 	private MemBuf<LogEntry> _logs = new MemBuf<LogEntry>(64);
-	public LoggingPreference Preference = new LoggingPreference { };
+	public LoggingPreference Preference = LoggingPreference.Default();
 	public MemBuf<LogEntry> Logs {
 		get => this._logs;
 		set {

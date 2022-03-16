@@ -5,35 +5,34 @@ online version:
 schema: 2.0.0
 ---
 
-# Approve-DotenvFile
+# Add-DotenvPattern
 
 ## SYNOPSIS
-Whitelists a particular env file for dotenv.
+Adds a glob pattern to the whitelist.
 
 ## SYNTAX
 
 ```
-Approve-DotenvFile [-Path] <String[]> [<CommonParameters>]
+Add-DotenvPattern [-Pattern] <String[]> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Whitelists a particular env file for dotenv.
+Adds a glob pattern to the whitelist.
 This only has an effect with the safe mode enabled.
-With the safe mode, files not explicitly allowed by you will not be sourced.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> Approve-DotenvFile ~\.env
+PS C:\> Add-DotenvPattern "$HOME/**"
 ```
 
-This example authorizes the file located at `~\.env`.
+This example whitelists any potential env file under the users home directory.
 
 ## PARAMETERS
 
-### -Path
-Path to an env file to allow.
+### -Pattern
+A glob pattern to whitelist.
 
 ```yaml
 Type: String[]

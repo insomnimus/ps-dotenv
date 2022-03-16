@@ -5,35 +5,35 @@ online version:
 schema: 2.0.0
 ---
 
-# Approve-DotenvFile
+# Approve-DotenvDir
 
 ## SYNOPSIS
-Whitelists a particular env file for dotenv.
+Whitelists a directory for dotenv.
 
 ## SYNTAX
 
 ```
-Approve-DotenvFile [-Path] <String[]> [<CommonParameters>]
+Approve-DotenvDir [-Path] <String[]> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Whitelists a particular env file for dotenv.
+Whitelists a directory for dotenv.
+Every existing and future env files under the directory (recursively) will be allowed.
 This only has an effect with the safe mode enabled.
-With the safe mode, files not explicitly allowed by you will not be sourced.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> Approve-DotenvFile ~\.env
+PS C:\> Approve-DotenvDir $HOME
 ```
 
-This example authorizes the file located at `~\.env`.
+This example whitelists the users home directory.
 
 ## PARAMETERS
 
 ### -Path
-Path to an env file to allow.
+A directory to whitelist; every file under it will be recursively allowed.
 
 ```yaml
 Type: String[]

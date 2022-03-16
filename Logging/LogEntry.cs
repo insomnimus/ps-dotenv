@@ -39,7 +39,7 @@ public readonly struct LogEntry {
 	}
 }
 
-public struct LoggingPreference {
+public class LoggingPreference {
 	public bool Error;
 	public bool Warning;
 	public bool Info;

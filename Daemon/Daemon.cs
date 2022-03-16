@@ -2,31 +2,22 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+
 using Dotenv.MemoryBuffer;
 using Dotenv.Parsing;
 using Dotenv.Errors;
 using Dotenv.Logging;
+using Dotenv.OSSpecific;
 
 namespace Dotenv;
 
 public class Daemon {
-	public Daemon(string[] authorized = null, bool enabled = false, bool safe = true, bool quiet = false) {
+	public Daemon(string[] whitelist = null, bool enabled = false, bool safe = true, bool quiet = false) {
 		this.Quiet = quiet;
 		this._enabled = enabled;
 		this._safe = safe;
-		var (comparison, comparer) = Environment.OSVersion.Platform switch {
-			PlatformID.Unix or PlatformID.MacOSX => (StringComparison.Ordinal, StringComparer.Ordinal),
-			_ => (StringComparison.OrdinalIgnoreCase, StringComparer.OrdinalIgnoreCase),
-		};
-		this.strComparison = comparison;
-		var auth = new HashSet<string>(comparer);
-		this._warned = new HashSet<string>(comparer);
-		if (authorized is not null) {
-			foreach (var f in authorized) {
-				auth.Add(Path.GetFullPath(f));
-			}
-		}
-		this._authorized = auth;
+		this._warned = new HashSet<string>(Platform.StrComparer);
+		this.auth = new Whitelist(whitelist);
 	}
 
 	// Members that are used in the module but not here.
@@ -37,15 +28,14 @@ public class Daemon {
 	private List<DotenvFile> _sourced = new List<DotenvFile>(32) { };
 	public bool IgnoreExportPrefix = true;
 	public bool SkipErrors = false;
-	private StringComparison strComparison;
 	private Logger log = new Logger();
 	private string lastdir = "";
 	public LoggingPreference LoggingPreference {
 		get => this.log.Preference;
 		set => this.log.Preference = value;
 	}
-	private HashSet<string> _authorized;
-	public ImmutableArray<string> AuthorizedFiles => this._authorized.ToImmutableArray();
+	private Whitelist auth;
+	public ICollection<string> AuthorizedPatterns => this.auth.Patterns;
 	private bool _safe = true;
 	public bool SafeMode {
 		get => this._safe;
@@ -79,16 +69,13 @@ public class Daemon {
 		}
 	}
 
-	private bool endsInSeparator(string p) => this.strComparison switch {
-		StringComparison.Ordinal => p.EndsWith('/'),
-		_ => p.EndsWith('\\') || p.EndsWith('/'),
-	};
-	private bool pathIsSourced(string p) => this._sourced.Exists(x => x.FilePath.Equals(p, this.strComparison));
+	private bool pathIsSourced(string p) => this._sourced.Exists(x => x.FilePath.Equals(p, Platform.StrComparison));
 
-	public void Enable() {
+	public void Enable(string pwd = null) {
+		pwd ??= this.lastdir;
 		if (this._enabled) return;
 		this._enabled = true;
-		this.Update(this.lastdir);
+		this.Update(pwd);
 	}
 
 	public void Disable() {
@@ -116,7 +103,7 @@ public class Daemon {
 		}
 
 		this._sourced.RemoveAll(x => {
-			if (pwd.StartsWith(x.Root, this.strComparison)) return false;
+			if (pwd.StartsWith(x.Root, Platform.StrComparison)) return false;
 			this.log.Debug($"unsourcing {x.FilePath}");
 			x.Unsource();
 			return true;
@@ -124,31 +111,39 @@ public class Daemon {
 
 		this._warned.RemoveWhere(x => {
 			var parent = Path.GetDirectoryName(x);
-			return !pwd.StartsWith(parent, this.strComparison);
+			return !pwd.StartsWith(parent, Platform.StrComparison);
 		});
 
-		var files = new List<string>(32) { };
+		var files = this.findEnvFiles(pwd, true);
+		this.sourceFiles(files);
+	}
 
+	private List<string> findEnvFiles(string pwd, bool ignoreSourced) {
+		var files = new List<string>(32) { };
 		var dir = pwd;
+
 		while (true) {
 			foreach (var name in this._names) {
 				var filepath = Path.Join(dir, name);
-				if (File.Exists(filepath) && !this.pathIsSourced(filepath)) files.Add(filepath);
+				if (File.Exists(filepath) && (!ignoreSourced || !this.pathIsSourced(filepath)))
+					files.Add(filepath);
 			}
 
-			if (string.IsNullOrEmpty(dir) || this.endsInSeparator(dir)) break;
+			if (string.IsNullOrEmpty(dir) || dir.EndsInSeparator()) break;
 			else dir = Path.GetDirectoryName(dir);
 		}
 
-		this.sourceFiles(files);
+		return files;
 	}
+
+	public List<string> FindEnvFiles(string pwd) => this.findEnvFiles(pwd, false);
 
 	private void sourceFiles(List<string> files) {
 		if (files is null || files.Count == 0) return;
 		var warned = false;
 
 		foreach (var f in files) {
-			if (this._safe && !this._authorized.Contains(f)) {
+			if (this._safe && !this.auth.IsMatch(f)) {
 				if (!this.Quiet && this._warned.Add(f)) {
 					this.log.Warn("unauthorized file not sourced while safe mode is on", f);
 					warned = true;
@@ -177,7 +172,7 @@ public class Daemon {
 	}
 
 	public bool AddName(string name) {
-		if (this._names.Exists(x => x.Equals(name, this.strComparison))) return false;
+		if (this._names.Exists(x => x.Equals(name, Platform.StrComparison))) return false;
 		foreach (var c in Path.GetInvalidFileNameChars()) {
 			if (name.Contains(c)) throw new ArgumentException("the name can't contain path separators, drive separators or any other illegal path character", "name");
 		}
@@ -188,16 +183,16 @@ public class Daemon {
 	}
 
 	public bool RemoveName(string name) {
-		var n = this._names.RemoveAll(x => x.Equals(name, this.strComparison));
+		var n = this._names.RemoveAll(x => x.Equals(name, Platform.StrComparison));
 		if (n == 0) return false;
 		this.Clear();
 		this.Update(this.lastdir);
 		return true;
 	}
 
-	public bool Authorize(string path, bool update = false) {
+	public bool AuthorizePattern(string path, bool update = false) {
 		var fullpath = Path.GetFullPath(path);
-		var ok = this._authorized.Add(fullpath);
+		var ok = this.auth.Add(fullpath);
 		this._warned.Remove(fullpath);
 		if (ok && this.SafeMode) {
 			this.Update(this.lastdir);
@@ -205,12 +200,19 @@ public class Daemon {
 		return ok;
 	}
 
-	public bool Unauthorize(string path, bool update = false) {
+	public bool UnauthorizePattern(string path, bool update = false) {
 		var fullpath = Path.GetFullPath(path);
-		var ok = this._authorized.Remove(fullpath);
+		var ok = this.auth.Remove(fullpath);
 		if (ok && this.SafeMode && update) {
 			this.Update(this.lastdir);
 		}
+		return ok;
+	}
+
+	public bool AuthorizeDirectory(string dir, bool update = false) {
+		var fullpath = Path.GetFullPath(dir);
+		var ok = this.auth.AddDir(fullpath);
+		if (ok && update) this.Update(this.lastdir);
 		return ok;
 	}
 }

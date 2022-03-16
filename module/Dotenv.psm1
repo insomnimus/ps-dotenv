@@ -13,7 +13,7 @@ function Update-Dotenv {
 		[Parameter(HelpMessage = "Forces the module to reload every env file if any.")]
 		[switch]$Force
 	)
-	if(!$force -and $pwd.providerpath -eq $script:lastdir ) {
+	if($pwd.provider.name -ne "FileSystem" -or (!$force -and $pwd.providerpath -eq $script:lastdir)) {
 		return
 	}
 	$script:lastdir = $pwd.providerpath
@@ -90,14 +90,14 @@ function Approve-DotenvFile {
 		[Parameter(
 			Mandatory,
 			Position = 0,
-			HelpMessage = "Path to an env file to allow."
+			HelpMessage = "Path to an env file or a directory to whitelist."
 		)]
 		[string[]]$Path
 	)
 	$yes = $false
 	foreach($f in $path) {
 		$f = [System.IO.Path]::GetFullPath($f, $pwd.providerpath)
-		if($script:Dotenv.Authorize($f, $false)) {
+		if($script:Dotenv.AuthorizePattern($f, $false)) {
 			write-information "allowed $f"
 			$yes = $true
 		} else {
@@ -105,7 +105,27 @@ function Approve-DotenvFile {
 		}
 	}
 	if($yes) {
-		$script:Dotenv.Update($pwd.providerpath)
+		script:update-dotenv -force
+	}
+}
+
+function Approve-DotenvDir {
+	[CmdletBinding()]
+	param(
+		[Parameter(
+			Mandatory,
+			Position = 0,
+			HelpMessage = "A directory to whitelist; every file under it will be recursively allowed."
+		)]
+		[ValidateScript({ (test-path -type container $_) -or (throw "path must target to an existing directory") })]
+		[string[]]$Path
+	)
+	$yes = $false
+	foreach($p in $path) {
+		$yes = $script:Dotenv.AuthorizeDirectory([System.IO.Path]::GetFullPath($p, $pwd.providerpath)) -or $yes
+	}
+	if($yes) {
+		script:update-dotenv -force
 	}
 }
 
@@ -117,12 +137,13 @@ function Deny-DotenvFile {
 			Position = 0,
 			HelpMessage = "Path to an env file to deny."
 		)]
+		[ArgumentCompleter({ $script:Dotenv.AuthorizedPatterns | where-object { [WildcardPattern]::ContainsWildcardCharacters("$_") } | sort-object })]
 		[string[]]$Path
 	)
 	$yes = $false
 	foreach($f in $path) {
 		$f = [System.IO.Path]::GetFullPath($f, $pwd.providerpath)
-		if($script:Dotenv.Unauthorize($f, $false)) {
+		if($script:Dotenv.UnauthorizePattern($f, $false)) {
 			write-information "denied $f"
 			$yes = $true
 		} else {
@@ -130,7 +151,51 @@ function Deny-DotenvFile {
 		}
 	}
 	if($yes) {
-		$script:Dotenv.Update($pwd.providerpath)
+		script:update-dotenv -force
+	}
+}
+
+function Add-DotenvPattern {
+	[CmdletBinding()]
+	param(
+		[Parameter(
+			Mandatory,
+			Position = 0,
+			HelpMessage = "A glob pattern to whitelist."
+		)]
+		[string[]]$Pattern
+	)
+	$yes = $false
+	foreach($p in $pattern) {
+		$yes = $script:Dotenv.AuthorizePattern($p) -or $yes
+	}
+	if($yes) {
+		script:update-dotenv -force
+	}
+}
+
+function Remove-DotenvPattern {
+	[CmdletBinding()]
+	param(
+		[Parameter(
+			Mandatory,
+			Position = 0,
+			HelpMessage = "A pattern to remove from the whitelisted patterns."
+		)]
+		[ArgumentCompleter({ $script:Dotenv.AuthorizedPatterns | sort-object })]
+		[string[]]$Pattern
+	)
+	$yes = $false
+	foreach($p in $pattern) {
+		if($script:Dotenv.UnauthorizePattern($p)) {
+			write-information "un-whitelisted $p"
+			$yes = $true
+		} else {
+			write-error "$p is not whitelisted"
+		}
+	}
+	if($yes) {
+		script:update-dotenv -force
 	}
 }
 
@@ -142,7 +207,10 @@ $exports = @{
 		"Enable-Dotenv"
 		"Disable-Dotenv"
 		"Approve-DotenvFile"
+		"Approve-DotenvDir"
 		"Deny-DotenvFile"
+		"Add-DotenvPattern"
+		"Remove-DotenvPattern"
 	)
 	Variable = "Dotenv"
 	Cmdlet = "Read-Dotenv"
