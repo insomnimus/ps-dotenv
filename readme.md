@@ -1,5 +1,7 @@
+[direnv]: https://direnv.net/
+
 # PS-Dotenv
-PS-Dotenv is an unintrusive yet fully featured `dotenv` module for `Powershell`.
+`Dotenv` is a feature complete and fully painless [direnv][] alternative for Powershell Core.
 
 ## Features
 - Complete syntax support including multiline strings and string interpolation.
@@ -13,7 +15,7 @@ PS-Dotenv is an unintrusive yet fully featured `dotenv` module for `Powershell`.
 -	It just works the way you'd expect it to.
 
 ## Use Case
-This module aims to provide the same functionality as [direnv](https://direnv.net/).
+This module aims to provide the same functionality as [direnv][].
 
 Add `Update-Dotenv` in your `Prompt` function and as you navigate directories, Dotenv will source the appropriate env files in the current directory and its parents.
 
@@ -22,6 +24,14 @@ The parsing of the env files is done in `C#` with a hand-written parser.
 
 Dotenv, when there are env files under $PWD or its parents, adds approximately 2 milliseconds to the prompt, which itself takes about 5 milliseconds.
 If no env files are detected, there's pretty much no overhead.
+
+# Installation
+You have 2 options:
+
+## Download a Release Archive
+Simply download the latest release from [the releases page](https://github.com/insomnimus/ps-dotenv/releases).
+
+Download `Dotenv.zip`, extract and put the `Dotenv` directory under your `$PSModulePath` as with any other module.
 
 ## Building the Project
 Make sure you have all the requirements installed:
@@ -41,7 +51,7 @@ git checkout main # This is sometimes required.
 Import-Module ./Dotenv
 ```
 
-## Usage
+# Usage
 For the env files to be automatically sourced, you'll need to configure your prompt to let `Dotenv` know you possibly changed directories.
 
 You don't need to check if the current directory changed or if there are files that must be loaded since `Dotenv` takes care of that for you by keeping its own state.
@@ -62,9 +72,8 @@ Depending on if you have a custom prompt follow one of the following steps:
 You just have to add the following snippet inside your prompt function:
 
 ```powershell
-# If we're in a filesystem path, tell dotenv to check itself.
-# We also check if the command exists to not cause errors.
-if((Test-Path function:/Update-Dotenv) -and $PWD.Provider.Name -eq "FileSystem") { Dotenv\Update-Dotenv }
+# We check if the command exists to not cause errors.
+if(Test-Path function:/Update-Dotenv) { Dotenv\Update-Dotenv }
 ```
 
 ### If you haven't customized your prompt
@@ -77,9 +86,8 @@ function prompt {
 		else { '' }) + 'PS ' + $(Get-Location) +
 	$(if ($NestedPromptLevel -ge 1) { '>>' }) + '> '
 
-	# If we're in a filesystem path, tell dotenv to check itself.
-	# We also check if the command exists to not cause any errors.
-	if((Test-Path function:/Update-Dotenv) -and $PWD.Provider.Name -eq "FileSystem") { Dotenv\Update-Dotenv }
+	# We check if the command exists to not cause any errors.
+	if(Test-Path function:/Update-Dotenv) { Dotenv\Update-Dotenv }
 }
 ```
 
@@ -101,4 +109,3 @@ function prompt {
 - `Unregister-DotenvName`: Removes a name from the list of names this module will consider as an env file. 
 - `Add-DotenvPattern`: Adds a glob pattern to the whitelist. 
 - `Remove-DotenvPattern`: Removes a pattern from the dotenv whitelist. 
-
