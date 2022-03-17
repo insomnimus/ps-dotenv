@@ -8,7 +8,7 @@ using Dotenv.OSSpecific;
 
 namespace Dotenv;
 
-public class Whitelist {
+internal class Whitelist {
 	public Whitelist(string[] globs = null) {
 		this._patterns = new(Platform.StrComparer);
 		if (globs is not null) {
