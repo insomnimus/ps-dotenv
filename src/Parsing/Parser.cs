@@ -1,9 +1,6 @@
 using System;
 using System.Text;
-using System.Collections.Generic;
-using Dotenv;
 using Dotenv.Errors;
-using System.Runtime.InteropServices;
 
 namespace Dotenv.Parsing;
 

@@ -1,7 +1,5 @@
-using System;
 using System.Management.Automation;
 using Dotenv.Parsing;
-using Dotenv.Errors;
 
 namespace Dotenv;
 

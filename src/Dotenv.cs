@@ -1,4 +1,3 @@
-using System;
 using Dotenv.Parsing;
 
 namespace Dotenv;

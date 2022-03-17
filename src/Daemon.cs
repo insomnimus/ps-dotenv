@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 using Dotenv.MemoryBuffer;
 using Dotenv.Parsing;
