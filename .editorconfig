@@ -8,7 +8,7 @@ insert_final_newline = true
 charset = utf-8
 
 [*.cs]
-dotnet_diagnostic.IDE0005 = true
+dotnet_diagnostic.IDE0005.severity = warning
 csharp_new_line_before_open_brace = false
 # csharp_new_line_before_else = never
 csharp_new_line_before_else = false
