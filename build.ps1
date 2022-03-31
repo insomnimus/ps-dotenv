@@ -14,8 +14,6 @@ function build-project($cfg = "debug", $out) {
 	$output = dotnet build `
 	--nologo `
 	--configuration $cfg `
-	--self-contained true `
-	"-p:PublishSingleFile=true" `
 	--output $out 2>&1
 	while(starts-with-space $output[0]) {
 		$output = $output[1..($output.length)]
