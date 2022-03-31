@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Dotenv.MemoryBuffer;
 
 public class MemBuf<T>: IEnumerable<T> {

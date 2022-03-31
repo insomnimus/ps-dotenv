@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Collections.Generic;
 
 using Dotenv.MemoryBuffer;
 using Dotenv.Parsing;
@@ -11,7 +8,7 @@ using Dotenv.OSSpecific;
 namespace Dotenv;
 
 public class Daemon {
-	public Daemon(string[] whitelist = null, bool enabled = false, bool safe = true, bool quiet = false) {
+	public Daemon(string[]? whitelist = null, bool enabled = false, bool safe = true, bool quiet = false) {
 		this.Quiet = quiet;
 		this._enabled = enabled;
 		this._safe = safe;
@@ -25,7 +22,6 @@ public class Daemon {
 	private bool _enabled = true;
 	private List<string> _names = new List<string>() { ".env" };
 	private List<DotenvFile> _sourced = new List<DotenvFile>(32) { };
-	public bool IgnoreExportPrefix = true;
 	public bool SkipErrors = false;
 	private Logger log = new Logger();
 	private string lastdir = "";
@@ -70,7 +66,7 @@ public class Daemon {
 
 	private bool pathIsSourced(string p) => this._sourced.Exists(x => x.FilePath.Equals(p, Platform.StrComparison));
 
-	public void Enable(string pwd = null) {
+	public void Enable(string? pwd = null) {
 		pwd ??= this.lastdir;
 		if (this._enabled) return;
 		this._enabled = true;
@@ -153,15 +149,26 @@ public class Daemon {
 			try {
 				this.log.Info("sourcing file", f);
 				var data = File.ReadAllText(f);
-				var res = Parser.Parse(data, this.SkipErrors, this.IgnoreExportPrefix);
-				if (res.Entries.Count > 0) {
-					try {
-						this._sourced.Add(new DotenvFile(f, res.Entries));
-					} catch (VarUnsetException e) {
-						this.log.Error(e.ToString(), f);
+				var entries = new List<Entry>();
+				var err = false;
+				foreach (var res in new Parser(data)) {
+					if (res.IsErr) {
+						this.log.Error($"parse error: {res.Err}", f);
+						if (!this.SkipErrors) {
+							err = true;
+							break;
+						}
+					} else {
+						entries.Add(res.Ok);
 					}
 				}
-				foreach (var e in res.Errors) this.log.Error(e.ToString(), f);
+				if (err || entries.Count == 0) continue;
+
+				try {
+					this._sourced.Add(new DotenvFile(f, entries));
+				} catch (VarUnsetException e) {
+					this.log.Error(e.ToString(), f);
+				}
 			} catch (Exception e) {
 				this.log.Exception(e, f);
 			}

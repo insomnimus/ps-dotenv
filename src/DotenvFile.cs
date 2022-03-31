@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Dotenv.Errors;
 
 namespace Dotenv;
@@ -23,7 +20,7 @@ public class DotenvFile {
 
 	public IList<EnvVar> Vars => this._vars.AsReadOnly();
 
-	internal DotenvFile(string path, List<EnvEntry> entries) {
+	internal DotenvFile(string path, List<Entry> entries) {
 		this.FilePath = path;
 		this.Root = Path.GetDirectoryName(path);
 		this.Name = Path.GetFileName(path);

@@ -109,3 +109,4 @@ function prompt {
 - `Unregister-DotenvName`: Removes a name from the list of names this module will consider as an env file. 
 - `Add-DotenvPattern`: Adds a glob pattern to the whitelist. 
 - `Remove-DotenvPattern`: Removes a pattern from the dotenv whitelist. 
+

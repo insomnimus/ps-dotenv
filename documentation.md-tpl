@@ -17,7 +17,6 @@ These are its fields:
 -	`LoggingPreference`: Configures how the logs are written, you can tab through its fields.
 -	`Parallel`: If set to true, everytime `Update-Dotenv` is called, it will be done in a new thread therefore will not block.
 -	`Names`: Controls which names are considered env files. You should either call its methods `AddName()` and `RemoveName()` or use the cmdlets `Register-DotenvName` and `Unregister-DotenvName`.
--	`IgnoreExportPrefix`: If set to true, the `export` keyword before a variable name will be ignored (this is common in *NIX systems).
 -	`SkipErrors`: If set to true, errors encountered during parsing env files will cause the parser to skip to the next line instead of returning.
 -	`SafeMode`: If enabled, only the files explicitly allowed will be sourced.
 -	`Quiet`: If set to `$true`, disables info messages while the safe mode is enabled and there are unauthorized files in the current directory or its parents.

@@ -4,7 +4,7 @@ using Dotenv.Parsing;
 namespace Dotenv;
 
 [Cmdlet(VerbsCommunications.Read, "Dotenv", DefaultParameterSetName = "file")]
-[OutputType(typeof(EnvEntry))]
+[OutputType(typeof(Entry))]
 public class ReadDotenvCmd: PSCmdlet {
 	[Parameter(
 	HelpMessage = "Path to a env file.",
@@ -13,7 +13,7 @@ public class ReadDotenvCmd: PSCmdlet {
 		Position = 0,
 		// ValueFromPipeline = true,
 		ValueFromPipelineByPropertyName = true)]
-	public string Path { get; set; }
+	public string? Path { get; set; }
 	[Parameter(
 	Mandatory = true,
 	Position = 0,
@@ -22,22 +22,20 @@ public class ReadDotenvCmd: PSCmdlet {
 	ValueFromPipeline = true,
 	ValueFromPipelineByPropertyName = true
 	)]
-	public string Text { get; set; }
-
-	[Parameter(HelpMessage = "Skip syntax errors if any are encountered. The default behaviour is to stop parsing.")]
-	public SwitchParameter SkipErrors { get; set; }
-	[Parameter(HelpMessage = "Ignore the `export ` prefix in env variables (POSIX shells have this keyword for exporting env variables).")]
-	public SwitchParameter IgnoreExportPrefix { get; set; }
+	public string? Text { get; set; }
 
 	private string filepath => this.GetUnresolvedProviderPathFromPSPath(this.Path);
-	private string data => this.ParameterSetName switch {
+	private string? data => this.ParameterSetName switch {
 		"text" => this.Text,
 		_ => System.IO.File.ReadAllText(this.filepath),
 	};
 
 	protected override void ProcessRecord() {
-		var res = Parser.Parse(this.data, this.SkipErrors, this.IgnoreExportPrefix);
-		foreach (var e in res.Entries) this.WriteObject(e);
-		foreach (var e in res.Errors) this.WriteError(new ErrorRecord(e, "Dotenv.ParseError", ErrorCategory.ParserError, null));
+		foreach (var res in new Parser(this.data)) {
+			if (res.IsErr)
+				this.WriteError(new ErrorRecord(res.Err, "Dotenv.ParseError", ErrorCategory.ParserError, null));
+			else
+				this.WriteObject(res.Ok);
+		}
 	}
 }

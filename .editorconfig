@@ -15,5 +15,6 @@ csharp_new_line_before_else = false
 csharp_new_line_before_catch = false
 csharp_new_line_before_finally = false
 csharp_new_line_between_query_expression_clauses = false
-
 csharp_space_before_colon_in_inheritance_clause = false
+
+dotnet_diagnostic.CS8604.severity = none

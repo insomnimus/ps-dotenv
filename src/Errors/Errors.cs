@@ -1,5 +1,3 @@
-using System;
-
 namespace Dotenv.Errors;
 
 public abstract class ParseError: Exception {
@@ -25,30 +23,13 @@ public class ErrMissingEquals: ParseError {
 }
 
 public class ErrUnclosedQuote: ParseError {
-	public Quote Kind { get; set; }
-
-	internal static string quoteStr(Quote q) => q switch {
-		Quote.Double => "double",
-		Quote.Single => "single",
-		Quote.MultiDouble => "multiline double",
-		Quote.MultiSingle => "multiline single",
-		_ => throw new LogicException($"{q} is not a recognized Quote")
-	};
-
-	public ErrUnclosedQuote(int line, Quote kind)
-	: base(line, $"unclosed {quoteStr(kind)} quote") {
-		Kind = kind;
-	}
+	public ErrUnclosedQuote(int line)
+	: base(line, "unclosed quote") { }
 }
 
-public class ErrInvalidMultiline: ParseError {
-	public ErrInvalidMultiline(int line)
-	: base(line, "a triple quoted string opening can only be followed by newline") { }
-}
-
-public class LogicException: ParseError {
-	public LogicException(string msg)
-	: base(0, $"internal logic error: {msg}") { }
+public class AssertionException: Exception {
+	public AssertionException(string msg)
+	: base($"internal logic error: {msg}") { }
 }
 
 public class ErrMissingNewline: ParseError {
@@ -58,7 +39,7 @@ public class ErrMissingNewline: ParseError {
 
 public class ErrMissingRBrace: ParseError {
 	public ErrMissingRBrace(int line)
-	: base(line, "the closing brace for the ${} interpolated variable is missing") { }
+	: base(line, "the closing brace for the parameter expansion is missing") { }
 }
 
 public class VarUnsetException: Exception {
@@ -68,6 +49,10 @@ public class VarUnsetException: Exception {
 	public VarUnsetException(string name, string msg)
 	: base($"{name}: {msg ?? "the value is not set"}") {
 		this.VariableName = name;
-		this.Msg = msg;
+		this.Msg = msg ?? "the variable is not set";
 	}
+}
+
+public class ErrBadSubstitution: ParseError {
+	public ErrBadSubstitution(int line) : base(line, "bad substitution") { }
 }

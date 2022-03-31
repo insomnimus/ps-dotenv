@@ -1,5 +1,3 @@
-using System;
-
 namespace Dotenv.OSSpecific;
 
 public static class Platform {

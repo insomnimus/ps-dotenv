@@ -1,6 +1,3 @@
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 
 using DotNet.Globbing;
 using Dotenv.OSSpecific;
@@ -8,7 +5,7 @@ using Dotenv.OSSpecific;
 namespace Dotenv;
 
 internal class Whitelist {
-	public Whitelist(string[] globs = null) {
+	public Whitelist(string[]? globs = null) {
 		this._patterns = new(Platform.StrComparer);
 		if (globs is not null) {
 			foreach (var x in globs) this.Add(x);

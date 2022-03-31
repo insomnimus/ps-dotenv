@@ -1,409 +1,364 @@
-using System;
 using System.Text;
+using System.Collections;
 using Dotenv.Errors;
 
 namespace Dotenv.Parsing;
 
-public class Parser {
+public class Parser: IEnumerable<Result<Entry>> {
+	public Parser(string input) {
+		this.input = input.Replace("\r\n", "\n");
+		this.ch = this.input.Length > 0 ? this.input[0] : EOF;
+	}
+
 	private const char EOF = char.MinValue;
-
 	private string input;
-	private int pos = 0;
-	private int readpos = 0;
-	private char ch;
 	private int line = 1;
-	private char peek => readpos >= input.Length ? EOF : input[readpos];
-	private bool ignoreExport = false;
+	private int pos = 0;
+	private char ch;
 
-	public Parser(string input, bool ignoreExport = true) {
-		this.input = input;
-		this.ignoreExport = ignoreExport;
-		this.read();
+	private int readpos => this.pos + 1;
+	private char peek => this.readpos < this.input.Length ? this.input[this.readpos] : EOF;
+
+	private void read() {
+		this.pos++;
+
+		if (this.pos >= this.input.Length) {
+			this.ch = EOF;
+		} else {
+			this.ch = this.input[this.pos];
+			if (this.ch == '\n') this.line++;
+		}
 	}
 
-	internal static string trimLF(string s) {
-		if (s.Length > 1 && s.Substring(s.Length - 2) == "\r\n") return s.Substring(0, s.Length - 2);
-		else if (s.Length > 0 && s[s.Length - 1] == '\n') return s.Substring(0, s.Length - 1);
-		else return s;
-	}
-
-	internal static char escaped(char c) => c switch {
+	private static char escaped(char c) => c switch {
 		'n' => '\n',
 		'r' => '\r',
 		'f' => '\f',
 		't' => '\t',
+		'v' => '\v',
 		'b' => '\b',
 		_ => c,
 	};
 
-	bool aheadIs(string s) => input.Substring(pos).StartsWith(s, StringComparison.Ordinal);
+	private static bool isSpecial(char c) => c switch {
+		'$' or '\\' or '"' or '\'' => true,
+		_ => false,
+	};
 
-	internal void read() {
-		if (readpos >= input.Length) {
-			this.ch = EOF;
-			pos = input.Length;
-			readpos = input.Length + 1;
-			return;
-		} else {
-			this.ch = input[readpos];
+	private void skipLine() => this.skipWhile(c => c != EOF && c != '\n');
+	private void skipSpace() => this.skipWhile(c => c != '\n' && char.IsWhiteSpace(c));
+	private void skipWhile(Func<char, bool> fn) {
+		while (this.ch != EOF && fn(this.ch)) this.read();
+	}
+
+	private string readWhile(Func<char, bool> fn) {
+		var start = this.pos;
+		while (this.ch != EOF && fn(this.ch)) this.read();
+		return this.input.Substring(start, this.pos - start);
+	}
+
+	private bool aheadIs(string s) => this.input.Substring(this.pos).StartsWith(s, StringComparison.Ordinal);
+
+	private void expect(char c) {
+		if (this.ch != c) throw new AssertionException($"expect({c})");
+		this.read();
+	}
+
+	private void expect(string s) {
+		if (!this.tryConsume(s)) throw new AssertionException($"expect({s})");
+	}
+
+	private bool tryConsume(string first, params string[] rest) {
+		if (this.aheadIs(first)) {
+			for (int i = 0; i < first.Length; i++) this.read();
+			return true;
 		}
-		this.pos = this.readpos;
-		this.readpos++;
-		if (ch == '\n') this.line++;
-	}
 
-	internal void expect(string s) {
-		if (!this.aheadIs(s)) {
-			var len = Math.Min(s.Length, input.Length - pos);
-			var got = input.Substring(pos, len);
-			throw new LogicException($"assertion failed: expected '{s}' ahead; got '{got}'");
-		}
-		foreach (var _ in s) read();
-	}
-
-	internal void expect(char c) {
-		if (ch != c) throw new LogicException($"assertion failed: expected {c}, got {ch}");
-		else read();
-	}
-
-	internal void skipLine() {
-		while (ch != '\n' && ch != EOF) read();
-		read();
-	}
-
-	internal void skipAny(string anyof) {
-		while (anyof.Contains(ch)) read();
-	}
-
-	internal Result<string> parseLHS() {
-		if (ch != '_' && !char.IsLetter(ch)) {
-			return new ErrInvalidName(line);
-		}
-		var start = pos;
-		while (ch == '_' || char.IsLetter(ch) || char.IsDigit(ch)) read();
-		return input.Substring(start, pos - start);
-	}
-
-	internal Result<EnvStr> readBare() {
-		var ln = line;
-		var buf = new StringBuilder();
-		var pieces = new EnvStr();
-
-		while (ch != EOF && !char.IsWhiteSpace(ch)) {
-			if (ch == '$') {
-				var res = this.parseExpand();
-				if (res.IsErr) return res.Err;
-
-				if (buf.Length > 0) pieces.add(buf.ToString());
-				buf.Clear();
-				pieces.add(res.Ok);
-			} else {
-				buf.Append(ch);
-				read();
+		foreach (var s in rest) {
+			if (this.aheadIs(s)) {
+				for (int i = 0; i < s.Length; i++) this.read();
+				return true;
 			}
 		}
 
-		if (buf.Length > 0) pieces.add(buf.ToString());
-
-		return pieces;
+		return false;
 	}
 
-	internal Result<EnvStr> readSingleQuote() {
-		var ln = line;
-		this.expect('\'');
-		var buf = new StringBuilder();
-
-		while (ch != '\'') {
-			switch (ch) {
-				case EOF:
-				case '\n':
-					return new ErrUnclosedQuote(ln, Quote.Single);
-				case '\\':
-					if (peek == '\'') read();
-					buf.Append(ch);
-					break;
-				default:
-					buf.Append(ch);
-					break;
-			};
-			read();
-		}
-
-		// Consume the quote.
-		this.expect("'");
-		return new EnvStr(buf.ToString());
-	}
-
-	internal Result<EnvStr> readDoubleQuote() {
-		var ln = line;
-		this.expect('"');
-		var buf = new StringBuilder();
-		var pieces = new EnvStr();
-
-		while (ch != '"') {
-			var mustRead = true;
-			switch (ch) {
-				case '$':
-					mustRead = false;
-					var res = this.parseExpand();
-					if (res.IsErr) return res.Err;
-
-					if (buf.Length > 0) pieces.add(buf.ToString());
-					buf.Clear();
-					pieces.add(res.Ok);
-					break;
-				case EOF:
-				case '\n':
-					return new ErrUnclosedQuote(ln, Quote.Double);
-				case '\\':
-					read();
-					if (ch == EOF) return new ErrUnclosedQuote(ln, Quote.Double);
-					buf.Append(escaped(ch));
-					break;
-				default:
-					buf.Append(ch);
-					break;
-			};
-
-			if (mustRead) read();
-		}
-
-		// Consume the quote.
-		this.expect('"');
-
-		if (buf.Length > 0) pieces.add(buf.ToString());
-		return pieces;
-	}
-
-	internal Result<EnvStr> readMultiSingle() {
-		var ln = line;
-		this.expect("'''");
-		while (ch != '\n') {
-			if (ch == EOF || !char.IsWhiteSpace(ch)) return new ErrInvalidMultiline(ln);
-			read();
-		}
-		this.expect('\n');
-
-		var buf = new StringBuilder();
-		while (true) {
-			switch (ch) {
-				case EOF: return new ErrUnclosedQuote(ln, Quote.MultiSingle);
-				case '\\':
-					if (peek == '\'') read();
-					buf.Append(ch);
-					break;
-				case '\'':
-					if (aheadIs("'''")) {
-						for (int i = 0; i < 4; i++) read();
-						return new EnvStr(trimLF(buf.ToString()));
-					}
-					buf.Append(ch);
-					break;
-				default:
-					buf.Append(ch);
-					break;
-			};
-			read();
-		}
-	}
-
-	internal Result<EnvStr> readMultiDouble() {
-		var ln = line;
-		this.expect("\"\"\"");
-		while (ch != '\n') {
-			if (ch == EOF || !char.IsWhiteSpace(ch)) return new ErrInvalidMultiline(ln);
-			read();
-		}
-		this.expect('\n');
-
-		var buf = new StringBuilder();
-		var pieces = new EnvStr();
-
-		while (true) {
-			var mustRead = true;
-			switch (ch) {
-				case EOF: return new ErrUnclosedQuote(ln, Quote.MultiDouble);
-				case '"' when this.aheadIs("\"\"\""):
-					for (var i = 0; i < 4; i++) read();
-					if (buf.Length > 0) pieces.add(trimLF(buf.ToString()));
-					return pieces;
-				case '\\':
-					read();
-					if (ch == EOF) return new ErrUnclosedQuote(ln, Quote.MultiDouble);
-					buf.Append(escaped(ch));
-					break;
-				case '$':
-					mustRead = false;
-					var res = this.parseExpand();
-					if (res.IsErr) return res.Err;
-
-					if (buf.Length > 0) pieces.add(buf.ToString());
-					buf.Clear();
-					pieces.add(res.Ok);
-					break;
-				default:
-					buf.Append(ch);
-					break;
-			};
-			if (mustRead) read();
-		}
-	}
-
-	internal Result<EnvStr> parseRHS() => this.ch switch {
-		'\n' => new EnvStr(""),
-		'\r' when this.peek == '\n' => new EnvStr(""),
-		'"' when this.aheadIs("\"\"\"") => this.readMultiDouble(),
-		'"' => this.readDoubleQuote(),
-		'\'' when this.aheadIs("'''") => this.readMultiSingle(),
-		'\'' => this.readSingleQuote(),
-		_ => this.readBare(),
-	};
-
-	internal Result<StrFragment> parseExpand() {
-		this.expect('$');
-
-		if (this.ch == '{') {
-			var res = this.readBracedExpand();
-			if (res.IsErr) return res.Err;
-			return new StrFragment(res.Ok);
-		} else if (this.ch == '_' || char.IsLetter(this.ch)) {
-			return new StrFragment(this.readNormalExpand());
-		} else {
+	private bool tryConsume(char first, params char[] rest) {
+		if (this.ch == first) {
 			this.read();
-			return new StrFragment("$");
+			return true;
+		} else {
+			foreach (var c in rest) {
+				if (c == this.ch) {
+					this.read();
+					return true;
+				}
+			}
 		}
+		return false;
 	}
 
-	internal ExpandStr readNormalExpand() {
-		var start = pos;
-		while (ch == '_' || char.IsLetterOrDigit(ch)) read();
-		return input.Substring(start, pos - start);
+	private Result<string> readName() {
+		if (this.ch != '_' && !char.IsLetter(this.ch)) return new ErrInvalidName(this.line);
+		var start = this.pos;
+		this.read();
+		while (this.ch == '_' || char.IsLetterOrDigit(this.ch)) this.read();
+		return this.input.Substring(start, this.pos - start);
 	}
 
-	internal Result<ExpandStr> readBracedExpand() {
+	private Result<Expansion> parseNormalExpand() {
+		var res = this.readName();
+		if (res.IsErr) return res.Err;
+		else return new Expansion(res.Ok);
+	}
+
+	private Result<Expansion> parseBracedExpand() {
 		var ln = this.line;
 		this.expect('{');
-		var start = this.pos;
-		var op = ExpansionType.Normal;
+		string left;
+		var leftRes = this.readName();
+		if (leftRes.IsErr) return leftRes.Err;
+		else if (string.IsNullOrEmpty(leftRes.Ok)) return new ErrBadSubstitution(ln);
+		else left = leftRes.Ok;
+
+		// Check for any expansion operator.
+		var op = ExpansionOp.OrNothing;
+		if (this.tryConsume("-", ":-"))
+			op = ExpansionOp.OrDefault;
+		else if (this.tryConsume("+", ":+"))
+			op = ExpansionOp.AndReplace;
+		else if (this.tryConsume("?", ":?"))
+			op = ExpansionOp.OrError;
+		else if (this.tryConsume('}'))
+			return new Expansion(left, op, new Value());
+		// If no operator is present, it must end here with '}'
+		else
+			return new ErrMissingRBrace(ln);
+		if (this.tryConsume('}')) return new Expansion(left, op, new Value());
+
+		var res = this.parseExpansionValue();
+		if (res.IsErr) return res.Err;
+
+		this.expect('}');
+		return new Expansion(left, op, res.Ok);
+	}
+
+	private Result<Expansion> parseExpand() {
+		this.expect('$');
+		if (this.ch == '{') return this.parseBracedExpand();
+		else return this.parseNormalExpand();
+	}
+
+	private Result<Value> parseExpansionValue() {
+		var ln = this.line;
+		var vals = new Value();
 
 		while (this.ch != '}') {
 			switch (this.ch) {
-				case '+':
-					op = ExpansionType.ReplaceIfExists;
-					break;
-				case '-':
-					op = ExpansionType.DefaultValue;
-					break;
-				case '?':
-					op = ExpansionType.MustExist;
-					break;
 				case EOF:
-				case '\n':
-				case '\r':
 					return new ErrMissingRBrace(ln);
+				case '"':
+					var resD = this.readDoubleQuote();
+					if (resD.IsErr) return resD.Err;
+					else vals.Add(resD.Ok);
+					break;
+				case '\'':
+					var resS = this.readSingleQuote();
+					if (resS.IsErr) return resS.Err;
+					else vals.Add(resS.Ok);
+					break;
+				case '$' when char.IsDigit(this.peek):
+					this.read();
+					this.skipWhile(c => char.IsDigit(c));
+					break;
+				case '$' when this.peek != '{' && this.peek != '_' && !char.IsLetter(this.peek):
+					vals.Add(new StrLiteral("$"));
+					this.read();
+					break;
+				case '$':
+					var res = this.parseExpand();
+					if (res.IsErr) return res.Err;
+					else vals.Add(res.Ok);
+					break;
+				case '\\':
+					this.read();
+					if (this.ch != '\n')
+						vals.Add(new StrLiteral(this.ch.ToString()));
+					this.read();
+					break;
 				default:
-					if (this.ch != '_' && !char.IsLetterOrDigit(this.ch)) return new ErrInvalidName(ln);
+					if (char.IsWhiteSpace(this.ch)) {
+						vals.Add(new StrLiteral(" "));
+						this.skipWhile(c => char.IsWhiteSpace(c));
+					} else {
+						vals.Add(new StrLiteral(
+				this.readWhile(c => !isSpecial(c) && c != '}' && !char.IsWhiteSpace(c))
+						));
+					}
 					break;
 			}
+		}
+
+		// Note: Don't expect here since this is done in parseBracedExpand
+		// this.expect('}');
+		return vals;
+	}
+
+	private Result<StrLiteral> readSingleQuote() {
+		var ln = this.line;
+		this.expect('\'');
+		var start = this.pos;
+		while (this.ch != '\'') {
+			if (this.ch == EOF) return new ErrUnclosedQuote(ln);
 			this.read();
-			if (op != ExpansionType.Normal) break;
 		}
+		var s = this.input.Substring(start, this.pos - start);
+		this.expect('\'');
+		return new StrLiteral(s);
+	}
 
-		var left = this.input.Substring(start, this.pos - start - (op == ExpansionType.Normal ? 0 : 1));
-		var pieces = new EnvStr();
+	private Result<Value> readDoubleQuote() {
+		var ln = this.line;
+		this.expect('"');
 
-		if (op != ExpansionType.Normal) {
-			var buf = new StringBuilder();
+		var buf = new StringBuilder();
+		var vals = new Value();
 
-			while (this.ch != '}') {
-				var mustRead = true;
-				switch (this.ch) {
-					case '$':
-						mustRead = false;
-						var res = this.parseExpand();
-						if (res.IsErr) return res.Err;
-
-						if (buf.Length > 0) pieces.add(buf.ToString());
+		while (this.ch != '"') {
+			switch (this.ch) {
+				case EOF:
+					return new ErrUnclosedQuote(ln);
+				// Ignore $0, $1 etc
+				case '$' when char.IsDigit(this.peek):
+					this.read();
+					this.skipWhile(c => char.IsDigit(c));
+					continue;
+				case '$' when this.peek != '{' && this.peek != '_' && !char.IsLetter(this.peek):
+					buf.Append('$');
+					this.read();
+					break;
+				case '$':
+					var res = this.parseExpand();
+					if (res.IsErr) return res.Err;
+					if (buf.Length != 0) {
+						vals.Add(new StrLiteral(buf.ToString()));
 						buf.Clear();
-						pieces.add(res.Ok);
-						break;
-					case EOF:
-					case '\n':
-						return new ErrMissingRBrace(ln);
-					case '\\':
-						read();
-						if (ch == EOF) return new ErrMissingRBrace(ln);
-						buf.Append(escaped(this.ch));
-						break;
-					default:
-						buf.Append(this.ch);
-						break;
-				};
-
-				if (mustRead) this.read();
+					}
+					vals.Add(res.Ok);
+					continue;
+				case '\\' when this.peek == '\n':
+					this.read();
+					break;
+				case '\\':
+					this.read();
+					buf.Append(escaped(this.ch));
+					break;
+				default:
+					buf.Append(this.ch);
+					break;
 			}
-			if (buf.Length > 0) pieces.add(buf.ToString());
+
+			this.read();
 		}
 
-		this.expect('}');
-		return new ExpandStr(left, pieces, op);
+		this.expect('"');
+
+		if (buf.Length != 0) vals.Add(new StrLiteral(buf.ToString()));
+		return vals;
 	}
 
-	internal Result<EnvEntry> parseEntry() {
-		// Skip whitespace.
-		while (ch != EOF && char.IsWhiteSpace(ch)) read();
-		if (ch == '#') {
-			this.skipLine();
-			return this.parseEntry();
-		}
-		if (ch == EOF) return null;
+	private Result<Value> parseValue() {
+		// a value is any number of adjacent strings or parameter expansion
+		var vals = new Value();
 
-		var ln = line;
-		var key = this.parseLHS();
-		if (key.IsErr) return key.Err;
-
-		// Ignore whitespace as a separator.
-		this.skipAny(" \t");
-		if (ch != '=') {
-			// Ignore the `export` prefix if the option is set.
-			if (!this.ignoreExport || key.Ok != "export" || (ch != '_' && !char.IsLetter(ch))) {
-				return new ErrMissingEquals(ln);
-			} else {
-				key = this.parseLHS();
-				if (key.IsErr) return key.Err;
-				this.skipAny(" \t");
-				if (ch != '=') return new ErrMissingEquals(ln);
+		while (this.ch != EOF && !char.IsWhiteSpace(this.ch)) {
+			switch (this.ch) {
+				case '"':
+					var resD = this.readDoubleQuote();
+					if (resD.IsErr) return resD.Err;
+					else vals.Add(resD.Ok);
+					break;
+				case '\'':
+					var resS = this.readSingleQuote();
+					if (resS.IsErr) return resS.Err;
+					else vals.Add(resS.Ok);
+					break;
+				case '$' when char.IsDigit(this.peek):
+					this.read();
+					this.skipWhile(c => char.IsDigit(c));
+					break;
+				case '$' when this.peek != '{' && this.peek != '_' && !char.IsLetter(this.peek):
+					vals.Add(new StrLiteral("$"));
+					this.read();
+					break;
+				case '$':
+					var res = this.parseExpand();
+					if (res.IsErr) return res.Err;
+					else vals.Add(res.Ok);
+					break;
+				case '\\':
+					if (this.peek == '\n') {
+						this.read();
+						this.read();
+						if (vals.Count == 0) {
+							this.skipSpace();
+							continue;
+						}
+					} else {
+						this.read();
+						vals.Add(new StrLiteral(this.ch.ToString()));
+					}
+					break;
+				default:
+					vals.Add(new StrLiteral(
+					this.readWhile(c => !char.IsWhiteSpace(c) && !isSpecial(c))
+					));
+					break;
 			}
 		}
-		this.expect('=');
-		this.skipAny(" \t");
+		return vals;
+	}
 
-		var rhs = this.parseRHS();
-		if (rhs.IsErr) return rhs.Err;
+	private Result<Entry> parseEntry() {
+		var ln = this.line;
+		this.tryConsume("export ", "export\t");
+		this.skipSpace();
+		var name = this.readName();
+		if (name.IsErr) return name.Err;
 
-		// Check for EOF or LF.
-		while (!(ch == EOF || ch == '\n' || ch == '#')) {
-			if (!char.IsWhiteSpace(ch)) return new ErrMissingNewline(line);
-			read();
+		this.skipSpace();
+
+		if (this.ch != '=') return new ErrMissingEquals(ln);
+		this.read();
+		this.skipSpace();
+
+		if (this.ch == '\n' || this.ch == EOF) {
+			return new Entry(name.Ok, new Value());
 		}
 
-		return new EnvEntry(key.Ok, rhs.Ok);
-	}
-
-	public ParseResult Parse(bool skipErrors = false) {
-		var items = new ParseResult();
-
-		for (var res = this.parseEntry(); res != null; res = this.parseEntry()) {
-			items.add(res);
-			if (res.IsErr && skipErrors) this.skipLine();
-			else if (res.IsErr) return items;
+		var res = this.parseValue();
+		if (res.IsErr) return res.Err;
+		this.skipSpace();
+		if (this.ch != '\n' && this.ch != '#' && this.ch != EOF) {
+			return new ErrMissingNewline(this.line);
 		}
-
-		return items;
+		return new Entry(name.Ok, res.Ok);
 	}
 
-	public static ParseResult Parse(string text, bool skipErrors = false, bool ignoreExport = true) {
-		var p = new Parser(text, ignoreExport);
-		return p.Parse(skipErrors);
+	public IEnumerator<Result<Entry>> GetEnumerator() {
+		while (this.ch != EOF) {
+			this.skipWhile(c => char.IsWhiteSpace(c));
+			if (this.ch == '#') {
+				this.skipLine();
+				continue;
+			}
+			if (this.ch == EOF) break;
+			var res = this.parseEntry();
+			if (res.IsErr) this.skipLine();
+			yield return res;
+		}
 	}
+
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

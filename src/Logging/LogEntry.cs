@@ -1,5 +1,3 @@
-using System;
-
 namespace Dotenv.Logging;
 
 public enum LogType {
@@ -13,15 +11,15 @@ public enum LogType {
 public readonly struct LogEntry {
 	public string Message { get; }
 	public LogType Type { get; }
-	public string Source { get; }
+	public string? Source { get; }
 
-	public LogEntry(string msg, LogType t, string src = null) => (this.Message, this.Type, this.Source) = (msg, t, src);
+	public LogEntry(string msg, LogType t, string? src = null) => (this.Message, this.Type, this.Source) = (msg, t, src);
 
-	public static LogEntry Error(string msg, string src = null) => new LogEntry(msg, LogType.Error, src);
-	public static LogEntry Warn(string msg, string src = null) => new LogEntry(msg, LogType.Warning, src);
-	public static LogEntry Info(string msg, string src = null) => new LogEntry(msg, LogType.Info, src);
-	public static LogEntry Debug(string msg, string src = null) => new LogEntry(msg, LogType.Debug, src);
-	public static LogEntry Exception(Exception e, string src = null) => new LogEntry(e.ToString(), LogType.Exception, src);
+	public static LogEntry Error(string msg, string? src = null) => new LogEntry(msg, LogType.Error, src);
+	public static LogEntry Warn(string msg, string? src = null) => new LogEntry(msg, LogType.Warning, src);
+	public static LogEntry Info(string msg, string? src = null) => new LogEntry(msg, LogType.Info, src);
+	public static LogEntry Debug(string msg, string? src = null) => new LogEntry(msg, LogType.Debug, src);
+	public static LogEntry Exception(Exception e, string? src = null) => new LogEntry(e.ToString(), LogType.Exception, src);
 
 	public override string ToString() {
 		var kind = this.Type switch {

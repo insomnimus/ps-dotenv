@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Dotenv.MemoryBuffer;
 
 internal class Util {
