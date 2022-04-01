@@ -1,7 +1,5 @@
-
 using Dotenv.MemoryBuffer;
 using Dotenv.Parsing;
-using Dotenv.Errors;
 using Dotenv.Logging;
 using Dotenv.OSSpecific;
 

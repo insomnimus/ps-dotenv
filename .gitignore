@@ -1,9 +1,8 @@
-/bin
-/obj
+/build
+bin
+obj
 _*
 *.exe
-/dotenv
 /load.ps1
 /gen-repodocs.ps1
 /ver.ps1
-/move-module.ps1

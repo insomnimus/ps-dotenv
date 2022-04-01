@@ -1,6 +1,4 @@
-using Dotenv.Parsing;
-
-namespace Dotenv;
+namespace Dotenv.Parsing;
 
 public readonly struct Entry {
 	public readonly string Name { get; init; }

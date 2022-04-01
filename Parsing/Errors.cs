@@ -1,4 +1,4 @@
-namespace Dotenv.Errors;
+namespace Dotenv.Parsing;
 
 public abstract class ParseError: Exception {
 	public int Line { get; set; }

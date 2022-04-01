@@ -1,4 +1,4 @@
-#!/usr/local/bin/env pwsh
+#!/bin/env pwsh -f
 param(
 	[switch]$release
 )
@@ -20,11 +20,11 @@ function build-project($cfg = "debug", $out) {
 	}
 
 	$output | % {
-		echo $_.replace("$PSScriptRoot\", "")
+		$_.replace("$PSScriptRoot\", "")
 	}
 }
 
-$out = "$PSScriptRoot/Dotenv"
+$out = "$PSScriptRoot/build/Dotenv"
 
 if(test-path -pathType container $out) {
 	remove-item -recurse $out

@@ -1,4 +1,4 @@
-using Dotenv.Errors;
+using Dotenv.Parsing;
 
 namespace Dotenv;
 

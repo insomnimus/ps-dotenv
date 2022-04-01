@@ -3,6 +3,8 @@
 # PS-Dotenv
 `Dotenv` is a feature complete and fully painless [direnv][] alternative for Powershell Core.
 
+It also exposes the parser as a separate project you can use in other code.
+
 ## Features
 - Complete syntax support including multiline strings and string interpolation.
 -	Works on any platform where Powershell Core runs.
@@ -48,7 +50,7 @@ cd ps-dotenv
 git checkout main # This is sometimes required.
 ./build.ps1 -release
 # Now import the module.
-Import-Module ./Dotenv
+Import-Module ./build/Dotenv
 ```
 
 # Usage

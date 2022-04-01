@@ -1,6 +1,4 @@
-using Dotenv.Errors;
-
-namespace Dotenv;
+namespace Dotenv.Parsing;
 
 public class Result<T> {
 	public T? Ok { get; set; }

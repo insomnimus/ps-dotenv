@@ -1,5 +1,4 @@
 using System.Text;
-using Dotenv.Errors;
 
 namespace Dotenv.Parsing;
 

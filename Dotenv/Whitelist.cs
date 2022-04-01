@@ -1,4 +1,3 @@
-
 using DotNet.Globbing;
 using Dotenv.OSSpecific;
 

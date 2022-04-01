@@ -1,6 +1,5 @@
 using System.Text;
 using System.Collections;
-using Dotenv.Errors;
 
 namespace Dotenv.Parsing;
 
