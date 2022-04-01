@@ -46,9 +46,9 @@ public class ErrMissingRBrace: ParseError {
 
 public class VarUnsetException: Exception {
 	public string VariableName { get; private set; }
-	public string Msg { get; private set; }
+	public string? Msg { get; private set; }
 
-	public VarUnsetException(string name, string msg)
+	public VarUnsetException(string name, string? msg)
 	: base($"{name}: {msg ?? "the value is not set"}") {
 		this.VariableName = name;
 		this.Msg = msg ?? "the variable is not set";
