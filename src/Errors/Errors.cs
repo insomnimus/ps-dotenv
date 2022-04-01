@@ -7,6 +7,8 @@ public abstract class ParseError: Exception {
 	: base($"line {line}: {msg}") {
 		Line = line;
 	}
+
+	public override string ToString() => this.Message;
 }
 
 public class ErrInvalidName: ParseError {
@@ -51,6 +53,8 @@ public class VarUnsetException: Exception {
 		this.VariableName = name;
 		this.Msg = msg ?? "the variable is not set";
 	}
+
+	public override string ToString() => base.Message;
 }
 
 public class ErrBadSubstitution: ParseError {

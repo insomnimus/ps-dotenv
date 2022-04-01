@@ -140,7 +140,7 @@ public class Daemon {
 		foreach (var f in files) {
 			if (this._safe && !this.auth.IsMatch(f)) {
 				if (!this.Quiet && this._warned.Add(f)) {
-					this.log.Warn("unauthorized file not sourced while safe mode is on", f);
+					this.log.Info("unauthorized file not sourced while safe mode is on", f);
 					warned = true;
 					System.Console.WriteLine($"dotenv info: {f} is not authorized, authorize it with `Approve-DotenvFile` or disable the safe mode");
 				}
