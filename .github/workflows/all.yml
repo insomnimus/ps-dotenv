@@ -44,7 +44,7 @@
         },
         {
           "name": "Build | Build",
-          "run": "pwsh ./build.ps1 -release\n7z a Dotenv.zip Dotenv"
+          "run": "pwsh -f ./build.ps1 -release; cd build; 7z a ../Dotenv.zip Dotenv; cd -"
         },
         {
           "name": "Setup | go",
