@@ -17,7 +17,7 @@ function Update-Dotenv {
 		return
 	}
 	$script:lastdir = $pwd.providerpath
-	if($script:Dotenv.Parallel) {
+	if($script:Dotenv.Async) {
 		Clear-DotenvJobs
 		Start-ThreadJob -Name "Dotenv" -ArgumentList $script:Dotenv, $force {
 			param(
