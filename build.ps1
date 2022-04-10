@@ -12,9 +12,9 @@ function starts-with-space($s) {
 
 function build-project($cfg = "debug", $out) {
 	$output = dotnet build `
-	--nologo `
-	--configuration $cfg `
-	--output $out 2>&1
+		--nologo `
+		--configuration $cfg `
+		--output $out 2>&1
 	while(starts-with-space $output[0]) {
 		$output = $output[1..($output.length)]
 	}
