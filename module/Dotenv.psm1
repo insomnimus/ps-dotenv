@@ -22,7 +22,7 @@ function Update-Dotenv {
 	}
 	if($script:Dotenv.Async) {
 		Clear-DotenvJobs
-		Start-ThreadJob -Name "Dotenv" -ArgumentList $script:Dotenv, $force {
+		$null = Start-ThreadJob -Name "Dotenv" -ArgumentList $script:Dotenv, $force {
 			param(
 				[Dotenv.Daemon]$Daemon,
 				[bool]$force
