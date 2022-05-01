@@ -24,7 +24,7 @@ Add `Update-Dotenv` in your `Prompt` function and as you navigate directories, D
 ## Performance
 The parsing of the env files is done in `C#` with a hand-written parser.
 
-Dotenv, when there are env files under $PWD or its parents, adds approximately 2 milliseconds to the prompt, which itself takes about 5 milliseconds.
+Dotenv, when there are env files under $PWD or its parents, adds approximately 10 milliseconds to the prompt, which itself takes about 20 milliseconds (on my machine).
 If no env files are detected, there's pretty much no overhead.
 
 # Installation
