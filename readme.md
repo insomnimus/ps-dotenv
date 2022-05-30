@@ -28,7 +28,7 @@ Dotenv, when there are env files under $PWD or its parents, adds about 1-10 mill
 If no env files are detected, there's pretty much no overhead.
 
 # Installation
-You have 2 options:
+You have 3 options:
 
 ## Via Scoop (recommended)
 First add [my bucket](https://github.com/insomnimus/scoop-bucket) to scoop:
