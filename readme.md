@@ -30,12 +30,25 @@ If no env files are detected, there's pretty much no overhead.
 # Installation
 You have 2 options:
 
+## Via Scoop (recommended)
+First add [my bucket](https://github.com/insomnimus/scoop-bucket) to scoop:
+
+`scoop bucket add insomnia https://github.com/insomnimus/scoop-bucket`
+
+Update scoop:
+
+`scoop update`
+
+Install the module:
+
+`scoop install ps-dotenv`
+
 ## Download a Release Archive
 Simply download the latest release from [the releases page](https://github.com/insomnimus/ps-dotenv/releases).
 
 Download `Dotenv.zip`, extract and put the `Dotenv` directory under your `$PSModulePath` as with any other module.
 
-## Building the Project
+## Build From Source
 Make sure you have all the requirements installed:
 
 -	`git`: To clone the repository.
