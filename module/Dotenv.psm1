@@ -1,4 +1,13 @@
 New-Variable -Option ReadOnly Dotenv ([Dotenv.Daemon]::new())
+
+$ExecutionContext.SessionState.Module.OnRemove += {
+	if($global:Dotenv.Enabled) {
+		Write-Host "dotenv: unloading..."
+		$global:Dotenv.Disable()
+		remove-item -force -ea silentlyContinue variable:/Dotenv
+	}
+}
+
 [string]$lastdir = $pwd.providerpath
 
 function Clear-DotenvJobs {
