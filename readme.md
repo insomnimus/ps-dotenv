@@ -1,9 +1,12 @@
 [direnv]: https://direnv.net/
 
 # PS-Dotenv
-`Dotenv` is a feature complete and fully painless [direnv][] alternative for Powershell Core.
+`Dotenv` is a feature complete and straightforward [direnv][] alternative for Powershell Core.
 
 It also exposes the parser as a separate project you can use in other code.
+
+## Stability
+Dotenv is stable and feature complete. the project is currently in maintain-only state. That means unless there's significant demand for a feature, only bug-fixes and other improvements will be added.
 
 ## Features
 - Complete syntax support including multiline strings and string interpolation.
