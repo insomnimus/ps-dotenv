@@ -8,7 +8,7 @@ $ExecutionContext.SessionState.Module.OnRemove += {
 	}
 }
 
-[string]$lastdir = $pwd.providerpath
+[string]$lastdir = ""
 
 function Clear-DotenvJobs {
 	Get-Job -State Completed `
