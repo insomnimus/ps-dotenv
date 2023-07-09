@@ -89,6 +89,7 @@ public class Daemon {
 
 	public void Update(string pwd) {
 		this.log.Debug($"update called in {pwd}");
+		if(String.IsNullOrEmpty(pwd)) return;
 		this.lastdir = pwd;
 		if (!this._enabled || this._names.Count == 0) {
 			this.log.Debug("nothing to do because the module is disabled or there are no names");
