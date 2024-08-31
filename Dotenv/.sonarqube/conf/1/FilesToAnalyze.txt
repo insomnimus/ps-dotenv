@@ -1,9 +1,0 @@
-﻿D:\home\projects\ps-dotenv\Dotenv\Daemon.cs
-D:\home\projects\ps-dotenv\Dotenv\DotenvFile.cs
-D:\home\projects\ps-dotenv\Dotenv\Logging\LogEntry.cs
-D:\home\projects\ps-dotenv\Dotenv\Logging\Logger.cs
-D:\home\projects\ps-dotenv\Dotenv\MemoryBuffer\MemBuf.cs
-D:\home\projects\ps-dotenv\Dotenv\MemoryBuffer\Util.cs
-D:\home\projects\ps-dotenv\Dotenv\Platform\Platform.cs
-D:\home\projects\ps-dotenv\Dotenv\Read-Dotenv.cs
-D:\home\projects\ps-dotenv\Dotenv\Whitelist.cs

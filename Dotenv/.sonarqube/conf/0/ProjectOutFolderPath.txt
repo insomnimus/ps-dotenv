@@ -1,1 +1,0 @@
-D:\home\projects\ps-dotenv\Dotenv\.sonarqube\out\0
