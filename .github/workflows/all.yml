@@ -9,19 +9,12 @@
       "runs-on": "ubuntu-latest",
       "steps": [
         {
-          "name": "Setup | Checkout",
-          "uses": "actions/checkout@v2"
+          "name": "checkout",
+          "uses": "actions/checkout@v4"
         },
         {
-          "name": "Setup | Install Dotnet",
-          "uses": "actions/setup-dotnet@v1",
-          "with": {
-            "dotnet-version": "6.0.x"
-          }
-        },
-        {
-          "name": "Check | Tests",
-          "run": "dotnet test"
+          "name": "build",
+          "run": "dotnet build"
         }
       ]
     },
@@ -32,38 +25,19 @@
       "runs-on": "ubuntu-latest",
       "steps": [
         {
-          "name": "Setup | Checkout",
-          "uses": "actions/checkout@v2"
+          "name": "checkout",
+          "uses": "actions/checkout@v4"
         },
         {
-          "name": "Setup | Install Dotnet",
-          "uses": "actions/setup-dotnet@v1",
-          "with": {
-            "dotnet-version": "6.0.x"
-          }
+          "name": "build",
+          "run": "pwsh -f ./build.ps1 -release && cd bin && 7z a ../Dotenv.zip Dotenv && cd -"
         },
         {
-          "name": "Build | Build",
-          "run": "pwsh -f ./build.ps1 -release; cd build; 7z a ../Dotenv.zip Dotenv; cd -"
-        },
-        {
-          "name": "Setup | go",
-          "uses": "actions/setup-go@v2",
-          "with": {
-            "go-version": "^1.15.7"
-          }
-        },
-        {
-          "name": "Setup | Release notes",
-          "run": "GO111MODULE=on go install github.com/git-chglog/git-chglog/cmd/git-chglog@v0.15.1\ngit-chglog -c .github/chglog/release.yml \"$(git describe --tags)\" > RELEASE.md"
-        },
-        {
-          "name": "Deploy | Publish",
-          "uses": "softprops/action-gh-release@v1",
-          "with": {
-            "files": "Dotenv.zip",
-            "body_path": "RELEASE.md"
-          }
+          "name": "create github release",
+          "env": {
+            "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+          },
+          "run": "gh release create ${{ github.ref_name }} Dotenv.zip --generate-notes --title ${{ github.ref_name }}"
         }
       ]
     }

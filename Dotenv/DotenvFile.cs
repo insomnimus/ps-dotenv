@@ -33,11 +33,11 @@ public class DotenvFile {
 				Environment.SetEnvironmentVariable(e.Name, expanded);
 				this._vars.Add(new EnvVar(e.Name, expanded, replaced));
 			}
-		} catch (VarUnsetException e) {
+		} catch (VarUnsetException) {
 			for (var i = this._vars.Count - 1; i >= 0; i--) {
 				this._vars[i].unset();
 			}
-			throw e;
+			throw;
 		}
 	}
 

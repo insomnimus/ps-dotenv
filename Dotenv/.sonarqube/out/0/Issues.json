@@ -1,0 +1,730 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft (R) Visual C# Compiler",
+        "version": "4.6.0.0",
+        "fileVersion": "4.6.0-3.23329.3 (5db00029)",
+        "semanticVersion": "4.6.0",
+        "language": "en-US"
+      },
+      "results": [
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 203,
+                  "startColumn": 3,
+                  "endLine": 203,
+                  "endColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/str.cs",
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 2,
+                  "endLine": 21,
+                  "endColumn": 67
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename interface 'Expr' to match pascal case naming rules, consider using 'IExpr'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/str.cs",
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 11,
+                  "endLine": 12,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2933",
+          "level": "warning",
+          "message": "Make 'input' 'readonly'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 17,
+                  "endLine": 13,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1144",
+          "level": "warning",
+          "message": "Remove the unused private method 'expect'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 66,
+                  "startColumn": 15,
+                  "endLine": 66,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3376",
+          "level": "warning",
+          "message": "Make this class name end with 'Exception'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Errors.cs",
+                "region": {
+                  "startLine": 3,
+                  "startColumn": 23,
+                  "endLine": 3,
+                  "endColumn": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2933",
+          "level": "warning",
+          "message": "Make 'fragments' 'readonly'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/str.cs",
+                "region": {
+                  "startLine": 66,
+                  "startColumn": 21,
+                  "endLine": 66,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3442",
+          "level": "warning",
+          "message": "Change the visibility of this constructor to 'protected'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Errors.cs",
+                "region": {
+                  "startLine": 6,
+                  "startColumn": 2,
+                  "endLine": 6,
+                  "endColumn": 8
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 76,
+                  "startColumn": 21,
+                  "endLine": 76,
+                  "endColumn": 25
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 77,
+                  "startColumn": 8,
+                  "endLine": 77,
+                  "endColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 152,
+                  "startColumn": 24,
+                  "endLine": 152,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 156,
+                  "startColumn": 3,
+                  "endLine": 156,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 157,
+                  "startColumn": 4,
+                  "endLine": 157,
+                  "endColumn": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 162,
+                  "startColumn": 6,
+                  "endLine": 162,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 163,
+                  "startColumn": 6,
+                  "endLine": 163,
+                  "endColumn": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 167,
+                  "startColumn": 6,
+                  "endLine": 167,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 168,
+                  "startColumn": 6,
+                  "endLine": 168,
+                  "endColumn": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 174,
+                  "startColumn": 36,
+                  "endLine": 174,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 180,
+                  "startColumn": 6,
+                  "endLine": 180,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 6,
+                  "endLine": 181,
+                  "endColumn": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 185,
+                  "startColumn": 6,
+                  "endLine": 185,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 190,
+                  "startColumn": 6,
+                  "endLine": 190,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 193,
+                  "startColumn": 8,
+                  "endLine": 193,
+                  "endColumn": 12
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 195,
+                  "startColumn": 39,
+                  "endLine": 195,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+2 (incl 1 for nesting)",
+              "10": "+3 (incl 2 for nesting)",
+              "11": "+1",
+              "12": "+1",
+              "2": "+3 (incl 2 for nesting)",
+              "3": "+1",
+              "4": "+3 (incl 2 for nesting)",
+              "5": "+1",
+              "6": "+1",
+              "7": "+3 (incl 2 for nesting)",
+              "8": "+1",
+              "9": "+3 (incl 2 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 26 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 270,
+                  "startColumn": 24,
+                  "endLine": 270,
+                  "endColumn": 34
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 274,
+                  "startColumn": 3,
+                  "endLine": 274,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 274,
+                  "startColumn": 25,
+                  "endLine": 274,
+                  "endColumn": 27
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 275,
+                  "startColumn": 4,
+                  "endLine": 275,
+                  "endColumn": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 278,
+                  "startColumn": 6,
+                  "endLine": 278,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 279,
+                  "startColumn": 6,
+                  "endLine": 279,
+                  "endColumn": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 283,
+                  "startColumn": 6,
+                  "endLine": 283,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 284,
+                  "startColumn": 6,
+                  "endLine": 284,
+                  "endColumn": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 290,
+                  "startColumn": 36,
+                  "endLine": 290,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 296,
+                  "startColumn": 6,
+                  "endLine": 296,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 297,
+                  "startColumn": 6,
+                  "endLine": 297,
+                  "endColumn": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 300,
+                  "startColumn": 6,
+                  "endLine": 300,
+                  "endColumn": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 303,
+                  "startColumn": 7,
+                  "endLine": 303,
+                  "endColumn": 9
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 307,
+                  "startColumn": 8,
+                  "endLine": 307,
+                  "endColumn": 12
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/home/projects/ps-dotenv/Parsing/Parser.cs",
+                "region": {
+                  "startLine": 314,
+                  "startColumn": 48,
+                  "endLine": 314,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+3 (incl 2 for nesting)",
+              "11": "+4 (incl 3 for nesting)",
+              "12": "+1",
+              "13": "+1",
+              "2": "+2 (incl 1 for nesting)",
+              "3": "+3 (incl 2 for nesting)",
+              "4": "+1",
+              "5": "+3 (incl 2 for nesting)",
+              "6": "+1",
+              "7": "+1",
+              "8": "+3 (incl 2 for nesting)",
+              "9": "+1"
+            }
+          }
+        }
+      ],
+      "rules": {
+        "S101": {
+          "id": "S101",
+          "shortDescription": "Types should be named in PascalCase",
+          "fullDescription": "Shared naming conventions allow teams to collaborate efficiently.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-101",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1144": {
+          "id": "S1144",
+          "shortDescription": "Unused private types or members should be removed",
+          "fullDescription": "This rule raises an issue when a private/internal type or member is never referenced in the code.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1144",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S125": {
+          "id": "S125",
+          "shortDescription": "Sections of code should not be commented out",
+          "fullDescription": "Commented-out code distracts the focus from the actual executed code. It creates a noise that increases maintenance code. And because it is never executed, it quickly becomes out of date and invalid.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-125",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2933": {
+          "id": "S2933",
+          "shortDescription": "Fields that are only assigned in the constructor should be \"readonly\"",
+          "fullDescription": "readonly fields can only be assigned in a class constructor. If a class has a field that’s not marked readonly but is only set in the constructor, it could cause confusion about the field’s intended use. To avoid confusion, such fields should be marked readonly to make their intended use explicit, and to prevent future maintainers from inadvertently changing their use.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2933",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3267": {
+          "id": "S3267",
+          "shortDescription": "Loops should be simplified with \"LINQ\" expressions",
+          "fullDescription": "When a loop is filtering, selecting or aggregating, those functions can be handled with a clearer, more concise LINQ expression instead.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3267",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3376": {
+          "id": "S3376",
+          "shortDescription": "Attribute, EventArgs, and Exception type names should end with the type being extended",
+          "fullDescription": "Adherence to the standard naming conventions makes your code not only more readable, but more usable. For instance, class FirstAttribute : Attribute can be used simply with First, but you must use the full name for class AttributeOne : Attribute.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3376",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3442": {
+          "id": "S3442",
+          "shortDescription": "\"abstract\" classes should not have \"public\" constructors",
+          "fullDescription": "The abstract modifier in a class declaration is used to indicate that a class is intended only to be a base class of other classes, not instantiated on its own.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3442",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3776": {
+          "id": "S3776",
+          "shortDescription": "Cognitive Complexity of methods should not be too high",
+          "fullDescription": "This rule raises an issue when the code cognitive complexity of a function is above a certain threshold.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3776",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+﻿D:\home\projects\ps-dotenv\Parsing\A.cs
+D:\home\projects\ps-dotenv\Parsing\Entry.cs
+D:\home\projects\ps-dotenv\Parsing\Errors.cs
+D:\home\projects\ps-dotenv\Parsing\Parser.cs
+D:\home\projects\ps-dotenv\Parsing\Result.cs
+D:\home\projects\ps-dotenv\Parsing\str.cs

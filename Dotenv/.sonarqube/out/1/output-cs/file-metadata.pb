@@ -1,0 +1,13 @@
+4
++D:\home\projects\ps-dotenv\Dotenv\Daemon.csutf-88
+/D:\home\projects\ps-dotenv\Dotenv\DotenvFile.csutf-8>
+5D:\home\projects\ps-dotenv\Dotenv\Logging\LogEntry.csutf-8<
+3D:\home\projects\ps-dotenv\Dotenv\Logging\Logger.csutf-8A
+8D:\home\projects\ps-dotenv\Dotenv\MemoryBuffer\MemBuf.csutf-8?
+6D:\home\projects\ps-dotenv\Dotenv\MemoryBuffer\Util.csutf-8?
+6D:\home\projects\ps-dotenv\Dotenv\Platform\Platform.csutf-89
+0D:\home\projects\ps-dotenv\Dotenv\Read-Dotenv.csutf-87
+.D:\home\projects\ps-dotenv\Dotenv\Whitelist.csutf-8^
+SD:\home\projects\ps-dotenv\Dotenv\obj\Debug\netstandard2.1\Dotenv.GlobalUsings.g.csutf-8u
+jD:\home\projects\ps-dotenv\Dotenv\obj\Debug\netstandard2.1\.NETStandard,Version=v2.1.AssemblyAttributes.csutf-8\
+QD:\home\projects\ps-dotenv\Dotenv\obj\Debug\netstandard2.1\Dotenv.AssemblyInfo.csutf-8

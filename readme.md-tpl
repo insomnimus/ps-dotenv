@@ -25,22 +25,15 @@ This module aims to provide the same functionality as [direnv][].
 Add `Update-Dotenv` in your `Prompt` function and as you navigate directories, Dotenv will source the appropriate env files in the current directory and its parents.
 
 ## Performance
-The parsing of the env files is done in `C#` with a hand-written parser.
-
-Dotenv, when there are env files under $PWD or its parents, adds about 1-10 milliseconds to the prompt, which itself takes about 5-20 milliseconds (on my machine).
-If no env files are detected, there's pretty much no overhead.
+Probing for and loading of `.env` files is I/O bound. The parsing itself takes very little time (less than a millisecond on my znver3 cpu).
 
 # Installation
 You have 3 options:
 
-## Via Scoop (recommended)
+## (Windows) Via Scoop (recommended)
 First add [my bucket](https://github.com/insomnimus/scoop-bucket) to scoop:
 
 `scoop bucket add insomnia https://github.com/insomnimus/scoop-bucket`
-
-Update scoop:
-
-`scoop update`
 
 Install the module:
 
@@ -55,7 +48,7 @@ Download `Dotenv.zip`, extract and put the `Dotenv` directory under your `$PSMod
 Make sure you have all the requirements installed:
 
 -	`git`: To clone the repository.
--	`dotnet cli` with `dotnet 6.0` or above: To build the project.
+-	`dotnet cli` with .NET SDK 8.0 or above: To build the project.
 -	`Powershell` version 6.0 or above: To run the build script.
 
 To build the project, run the commands below.
@@ -63,10 +56,10 @@ To build the project, run the commands below.
 ```powershell
 git clone https://github.com/insomnimus/ps-dotenv
 cd ps-dotenv
-git checkout main # This is sometimes required.
+git checkout main # This is sometimes  necessary
 ./build.ps1 -release
 # Now import the module.
-Import-Module ./build/Dotenv
+Import-Module ./bin/Dotenv
 ```
 
 # Usage

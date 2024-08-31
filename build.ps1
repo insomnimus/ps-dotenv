@@ -11,7 +11,7 @@ function starts-with-space($s) {
 }
 
 function build-project($cfg = "debug", $out) {
-	$output = dotnet build `
+	$output = dotnet publish `
 		--nologo `
 		--configuration $cfg `
 		--output $out 2>&1
@@ -24,7 +24,7 @@ function build-project($cfg = "debug", $out) {
 	}
 }
 
-$out = "$PSScriptRoot/build/Dotenv"
+$out = "$PSScriptRoot/bin/Dotenv"
 
 if(test-path -pathType container $out) {
 	remove-item -recurse $out
