@@ -116,16 +116,15 @@ public class Daemon {
 		var files = new List<string>(32) { };
 		var dir = pwd;
 
-		while (true) {
+		do {
 			foreach (var name in this._names) {
 				var filepath = Path.Join(dir, name);
 				if (File.Exists(filepath) && (!ignoreSourced || !this.pathIsSourced(filepath)))
 					files.Add(filepath);
 			}
 
-			if (string.IsNullOrEmpty(dir) || dir.EndsInSeparator()) break;
-			else dir = Path.GetDirectoryName(dir);
-		}
+			dir = Path.GetDirectoryName(dir);
+		} while (!string.IsNullOrEmpty(dir) && !dir.EndsInSeparator());
 
 		return files;
 	}
